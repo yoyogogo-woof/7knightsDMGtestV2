@@ -1,284 +1,443 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
+<!doctype html>
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>傷害計算器</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>傷害計算器（對齊修正版）</title>
 <style>
-body {
-  font-family: "Microsoft JhengHei", sans-serif;
-  background-color: #f5f6f7;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px;
-}
+  :root{
+    --card-w:320px;
+    --gap-x:18px;
+    --input-h:34px;
+    --input-w:140px;
+    --diff-w:72px;
+    --font: "Microsoft JhengHei", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:var(--font);
+    background:#f5f6f8;
+    margin:0;
+    padding:28px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+  }
+  h1{margin:0;font-size:20px}
 
-h1 {
-  font-size: 20px;
-  margin-bottom: 20px;
-}
+  /* 整體三欄 grid (每一列會放三個 cell: 左 / 中 / 右) */
+  .grid-layout{
+    display:grid;
+    grid-template-columns: var(--card-w) var(--gap-x) var(--card-w);
+    gap:0 var(--gap-x);
+    align-items:start;
+  }
 
-.container {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 16px;
-  align-items: start;
-}
+  /* 左右卡片外框只是視覺效果，實際欄位列會填入到 grid-row 中 */
+  .card {
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 6px 18px rgba(15,23,42,0.06);
+    padding:12px;
+  }
+  .card h2{margin:0 0 8px 0;font-size:15px}
+  .section-title{font-weight:600;margin-top:12px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
 
-.card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  padding: 16px;
-  width: 290px;
-}
+  /* 我們會在 grid 中放 row cell */
+  .row-cell {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+    padding:6px 0;
+  }
+  .label{font-size:13px; white-space:nowrap; width:46%}
+  .input-wrap{position:relative;width:54%}
+  .input{
+    width:100%;
+    height:var(--input-h);
+    border-radius:8px;
+    border:1px solid #e2e8f0;
+    text-align:right;
+    padding:6px 10px;
+    font-size:13px;
+    background:#fff;
+  }
+  .input.gray{ background:#f3f4f6; }
 
-.section {
-  margin-bottom: 18px;
-}
+  /* 百分比右側符號 */
+  .with-pct .input{ padding-right:34px; }
+  .with-pct .pct {
+    position:absolute;
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#6b7280;
+    font-size:13px;
+    pointer-events:none;
+  }
 
-.section h2 {
-  font-size: 15px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-}
+  /* 中間 diff column */
+  .diff-col{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    padding-top:6px;
+  }
+  .diff-input{
+    width:var(--diff-w);
+    height:var(--input-h);
+    text-align:center;
+    border-radius:8px;
+    border:1px solid #e2e8f0;
+    font-size:13px;
+    color:#111827;
+    background:#fff;
+  }
+  .diff-input::placeholder{color:#9ca3af}
 
-label {
-  font-size: 13px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 4px 0;
-}
+  /* section headers (span across 3 columns) */
+  .section-full {
+    grid-column:1 / 4;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+  }
 
-.input-wrapper {
-  position: relative;
-  width: 120px;
-}
+  /* results area */
+  .results {
+    width: calc(var(--card-w) * 2 + var(--gap-x));
+    background:#fff;border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+  }
 
-.input-wrapper input {
-  width: 100%;
-  text-align: right;
-  padding-right: 18px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  height: 26px;
-  font-size: 13px;
-}
+  /* make select wider and aligned */
+  .select-wide{ width:100%; padding:6px; border-radius:8px; border:1px solid #e2e8f0; }
 
-.input-wrapper input.gray {
-  background: #f0f0f0;
-}
+  /* smaller text */
+  .small{ font-size:13px; color:#374151 }
 
-.input-wrapper::after {
-  content: "%";
-  position: absolute;
-  right: 6px;
-  top: 4px;
-  font-size: 12px;
-  color: #555;
-  pointer-events: none;
-}
-
-select {
-  width: 270px;
-  padding: 4px 6px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 13px;
-}
-
-.adjust-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
-  gap: 18px;
-  padding-top: 28px;
-}
-
-.adjust-col input {
-  width: 60px;
-  height: 26px;
-  text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  color: #333;
-  font-size: 13px;
-}
-
-.adjust-col input::placeholder {
-  color: #999;
-  text-align: center;
-}
-
-.results {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  padding: 16px;
-  margin-top: 20px;
-  width: 620px;
-  font-size: 13px;
-}
+  /* ensure labels align and input heights equal by using same row structure */
 </style>
 </head>
 <body>
+
 <h1>傷害計算器</h1>
 
-<div class="container">
-  <!-- 左欄 -->
-  <div class="card" id="leftCard">
-    <div class="section">
-      <h2>🗡 主輸出</h2>
-      <label>面板攻擊力 <div class="input-wrapper"><input type="number" id="atkL" value="3600"></div></label>
-      <label>基礎攻擊力 <div class="input-wrapper"><input type="number" id="baseL" value="1500"></div></label>
-      <label>招式倍率 <div class="input-wrapper"><input type="number" id="skillRateL" value="100"></div></label>
-      <label>暴擊傷害 <div class="input-wrapper"><input type="number" id="critDmgL" value="200"></div></label>
-      <label>陣型提升攻擊力 <div class="input-wrapper"><input type="number" id="formAtkL" value="42"></div></label>
-    </div>
+<!-- grid-layout: left card column | gap | right card column -->
+<div class="grid-layout" id="grid">
 
-    <div class="section">
-      <h2>💎 套裝效果</h2>
-      <select id="setL">
-        <option value="none">無套裝效果</option>
-        <option value="tracker4">追蹤者四件套 (+65% 弱點傷害)</option>
-        <option value="avenger2">復仇者兩件套 (+15% 傷害量)</option>
-        <option value="avenger4">復仇者四件套 (+30% 傷害量)</option>
-        <option value="avenger4boss">復仇者四件套(攻擊對象為BOSS) (+70% 傷害量)</option>
-      </select>
-    </div>
-
-    <div class="section">
-      <h2>✨ BUFF (選填)</h2>
-      <label>攻擊力增加 <div class="input-wrapper"><input type="number" id="atkBuffL"></div></label>
-      <label>弱點傷害增加 <div class="input-wrapper"><input type="number" id="weakBuffL"></div></label>
-      <label>傷害量增加 <div class="input-wrapper"><input type="number" id="dmgBuffL"></div></label>
-      <label>暴擊傷害增加 <div class="input-wrapper"><input type="number" id="critBuffL"></div></label>
-      <label>減少防禦力 <div class="input-wrapper"><input type="number" id="defDebuffL"></div></label>
-      <label>無視防禦 <div class="input-wrapper"><input type="number" id="ignoreDefL"></div></label>
-    </div>
-
-    <div class="section">
-      <h2>🐉 寵物</h2>
-      <label>寵物攻擊力 <div class="input-wrapper"><input type="number" id="petAtkL"></div></label>
-    </div>
-
-    <div class="section">
-      <h2>🛡 敵人</h2>
-      <label>敵方防禦力 <div class="input-wrapper"><input type="number" id="enemyDefL"></div></label>
-      <label>物理/魔法減傷 <div class="input-wrapper"><input type="number" id="enemyReductL"></div></label>
-      <label>增加防禦力 <div class="input-wrapper"><input type="number" id="enemyBuffL"></div></label>
-    </div>
-
-    <div class="section">
-      <h2>📊 結果</h2>
-      <div id="resultL">只暴擊：0<br>只弱點：0<br>最終傷害：0</div>
-    </div>
+  <!-- We'll create the header area for left card (visual) -->
+  <div class="card" id="leftCardVis">
+    <h2>🗡 主輸出（A）</h2>
+    <!-- placeholder for spacing - content rows are created in grid rows below -->
   </div>
 
-  <!-- 中間增減 -->
-  <div class="adjust-col">
-    <input type="number" class="adjust" id="adjAtk" placeholder="+/-">
-    <input type="number" class="adjust" id="adjBase" placeholder="+/-">
-    <input type="number" class="adjust" id="adjSkill" placeholder="+/-">
-    <input type="number" class="adjust" id="adjCrit" placeholder="+/-">
-    <input type="number" class="adjust" id="adjForm" placeholder="+/-">
+  <!-- middle column is intentionally empty top space to keep alignment -->
+  <div></div>
+
+  <div class="card" id="rightCardVis">
+    <h2>🗡 主輸出（B）</h2>
   </div>
 
-  <!-- 右欄 -->
-  <div class="card" id="rightCard">
-    <div class="section">
-      <h2>🗡 主輸出</h2>
-      <label>面板攻擊力 <div class="input-wrapper"><input type="number" id="atkR"></div></label>
-      <label>基礎攻擊力 <div class="input-wrapper"><input type="number" id="baseR"></div></label>
-      <label>招式倍率 <div class="input-wrapper"><input type="number" id="skillRateR"></div></label>
-      <label>暴擊傷害 <div class="input-wrapper"><input type="number" id="critDmgR"></div></label>
-      <label>陣型提升攻擊力 <div class="input-wrapper"><input type="number" id="formAtkR"></div></label>
-    </div>
+  <!-- SECTION: main fields header across whole width -->
+  <div class="section-full"><strong>主輸出</strong></div>
 
-    <div class="section">
-      <h2>💎 套裝效果</h2>
-      <select id="setR">
-        <option value="none">無套裝效果</option>
-        <option value="tracker4">追蹤者四件套 (+65% 弱點傷害)</option>
-        <option value="avenger2">復仇者兩件套 (+15% 傷害量)</option>
-        <option value="avenger4">復仇者四件套 (+30% 傷害量)</option>
-        <option value="avenger4boss">復仇者四件套(攻擊對象為BOSS) (+70% 傷害量)</option>
-      </select>
-    </div>
-
-    <div class="section">
-      <h2>✨ BUFF (選填)</h2>
-      <label>攻擊力增加 <div class="input-wrapper"><input type="number" id="atkBuffR"></div></label>
-      <label>弱點傷害增加 <div class="input-wrapper"><input type="number" id="weakBuffR"></div></label>
-      <label>傷害量增加 <div class="input-wrapper"><input type="number" id="dmgBuffR"></div></label>
-      <label>暴擊傷害增加 <div class="input-wrapper"><input type="number" id="critBuffR"></div></label>
-      <label>減少防禦力 <div class="input-wrapper"><input type="number" id="defDebuffR"></div></label>
-      <label>無視防禦 <div class="input-wrapper"><input type="number" id="ignoreDefR"></div></label>
-    </div>
-
-    <div class="section">
-      <h2>🐉 寵物</h2>
-      <label>寵物攻擊力 <div class="input-wrapper"><input type="number" id="petAtkR"></div></label>
-    </div>
-
-    <div class="section">
-      <h2>🛡 敵人</h2>
-      <label>敵方防禦力 <div class="input-wrapper"><input type="number" id="enemyDefR"></div></label>
-      <label>物理/魔法減傷 <div class="input-wrapper"><input type="number" id="enemyReductR"></div></label>
-      <label>增加防禦力 <div class="input-wrapper"><input type="number" id="enemyBuffR"></div></label>
-    </div>
-
-    <div class="section">
-      <h2>📊 結果</h2>
-      <div id="resultR">只暴擊：0<br>只弱點：0<br>最終傷害：0</div>
-    </div>
-  </div>
+  <!-- Now we will render each field row as three sibling elements that occupy same grid row:
+       left-cell (in first column), mid-cell (in second column), right-cell (in third column) -->
 </div>
 
-<div class="results" id="compareResult">
-  總計算結果區
+<!-- results -->
+<div class="results" id="results">
+  <div class="small"><strong>A 結果：</strong><span id="resA">請輸入數值</span></div>
+  <div class="small" style="margin-top:6px;"><strong>B 結果：</strong><span id="resB">請輸入數值</span></div>
+  <div style="margin-top:8px;"><strong id="resDiff">B vs A 差異：0%</strong></div>
 </div>
 
 <script>
-// --- 基本同步邏輯 ---
-const leftInputs = document.querySelectorAll("#leftCard input");
-const rightInputs = document.querySelectorAll("#rightCard input");
-const adjustInputs = document.querySelectorAll(".adjust");
+/* Fields definition in display order */
+const SECTIONS = [
+  { title:'主輸出', fields:[
+    {id:'atkPanel', label:'面板攻擊力', type:'number'},
+    {id:'atkBase', label:'基礎攻擊力', type:'number'},
+    {id:'skillRate', label:'招式倍率', type:'percent'},
+    {id:'critDmg', label:'暴擊傷害', type:'percent'},
+    {id:'formAtk', label:'陣型提升攻擊力', type:'percent'},
+  ]},
+  { title:'套裝效果', fields:[
+    // we'll have selects after the main fields area
+  ]},
+  { title:'BUFF（選填）', fields:[
+    {id:'buffAtk', label:'攻擊力增加', type:'percent'},
+    {id:'weakDmg', label:'弱點傷害量增加', type:'percent'},
+    {id:'revengeDmg', label:'傷害量增加', type:'percent'},
+    {id:'buffCritDMG', label:'暴擊傷害增加', type:'percent'},
+    {id:'deffDown', label:'減少防禦力', type:'percent'},
+    {id:'deffIgnore', label:'無視防禦', type:'percent'},
+  ]},
+  { title:'寵物', fields:[
+    {id:'petAtkFlat', label:'寵物攻擊力', type:'number'},
+    {id:'petAtkPercent', label:'潛能：增加攻擊力', type:'percent'},
+    {id:'petSkillAtk', label:'技能：增加攻擊力', type:'percent'},
+    {id:'petCritDmg', label:'技能：增加暴擊傷害', type:'percent'},
+    {id:'petDmgIncrese', label:'技能：增加傷害', type:'percent'},
+  ]},
+  { title:'敵人', fields:[
+    {id:'enemyDef', label:'敵方防禦力', type:'number'},
+    {id:'reduceRate', label:'物理/魔法減傷', type:'percent'},
+    {id:'enemyDefIncrease', label:'增加防禦力', type:'percent'},
+  ]}
+];
 
-leftInputs.forEach((input, i) => {
-  input.addEventListener("input", () => syncRight(i));
-});
+/* build grid rows */
+const grid = document.getElementById('grid');
 
-adjustInputs.forEach((adj, i) => {
-  adj.addEventListener("input", () => applyAdjust(i));
-});
-
-function syncRight(i) {
-  const L = leftInputs[i];
-  const R = rightInputs[i];
-  const adj = adjustInputs[i];
-  if (!R.value || R.classList.contains("gray")) {
-    R.value = Number(L.value) + Number(adj.value || 0);
-    R.classList.add("gray");
-  }
+function addSectionHeader(title){
+  const header = document.createElement('div');
+  header.className = 'section-full';
+  header.textContent = title;
+  grid.appendChild(header);
 }
 
-function applyAdjust(i) {
-  const L = leftInputs[i];
-  const R = rightInputs[i];
-  const adj = adjustInputs[i];
-  if (adj.value === "") {
-    R.value = L.value;
-    R.classList.add("gray");
+function addFieldRow(field){
+  // left cell
+  const leftCell = document.createElement('div');
+  leftCell.className='row-cell';
+  const lLabel = document.createElement('div'); lLabel.className='label'; lLabel.textContent = field.label;
+  const lWrap = document.createElement('div'); lWrap.className='input-wrap';
+  const lInput = document.createElement('input');
+  lInput.type='number'; lInput.id = field.id + '-L'; lInput.className='input';
+  if(field.type==='percent'){ lWrap.classList.add('with-pct'); const pct = document.createElement('div'); pct.className='pct'; pct.textContent='%'; lWrap.appendChild(pct); }
+  lWrap.appendChild(lInput);
+  leftCell.appendChild(lLabel); leftCell.appendChild(lWrap);
+
+  // middle cell
+  const midCell = document.createElement('div');
+  midCell.style.display='flex'; midCell.style.justifyContent='center'; midCell.style.alignItems='center';
+  const midInput = document.createElement('input'); midInput.className='diff-input'; midInput.id=field.id + '-D';
+  midInput.placeholder = '+/-';
+  if(field.type==='percent') {
+    // add percent mark as pseudo by creating a small span absolute inside wrapper
+    const wrapper = document.createElement('div'); wrapper.style.position='relative';
+    midInput.style.paddingRight='20px';
+    const mark = document.createElement('div'); mark.className='diff-percent-mark'; mark.textContent='%';
+    mark.style.position='absolute'; mark.style.right='8px'; mark.style.top='50%'; mark.style.transform='translateY(-50%)'; mark.style.color='#6b7280';
+    wrapper.appendChild(midInput); wrapper.appendChild(mark);
+    midCell.appendChild(wrapper);
   } else {
-    R.value = Number(L.value) + Number(adj.value);
-    R.classList.remove("gray");
+    midCell.appendChild(midInput);
   }
+
+  // right cell
+  const rightCell = document.createElement('div');
+  rightCell.className='row-cell';
+  const rLabel = document.createElement('div'); rLabel.className='label'; rLabel.textContent = field.label;
+  const rWrap = document.createElement('div'); rWrap.className='input-wrap';
+  const rInput = document.createElement('input'); rInput.type='number'; rInput.id=field.id + '-R'; rInput.className='input gray';
+  if(field.type==='percent'){ rWrap.classList.add('with-pct'); const pct2 = document.createElement('div'); pct2.className='pct'; pct2.textContent='%'; rWrap.appendChild(pct2); }
+  rWrap.appendChild(rInput);
+  rightCell.appendChild(rLabel); rightCell.appendChild(rWrap);
+
+  grid.appendChild(leftCell);
+  grid.appendChild(midCell);
+  grid.appendChild(rightCell);
 }
+
+/* add main fields rows */
+SECTIONS.forEach(section => {
+  if(section.title!=='主輸出'){ addSectionHeader(section.title); }
+  section.fields.forEach(f => addFieldRow(f));
+});
+
+/* add section for sets (in buff area) - we put selects in left and right columns, middle empty */
+const setHeader = document.createElement('div'); setHeader.className='section-full'; setHeader.innerHTML = '<strong>套裝效果（放在 BUFF 區上方）</strong>'; grid.appendChild(setHeader);
+
+// left select cell
+const leftSetCell = document.createElement('div'); leftSetCell.style.display='flex'; leftSetCell.style.alignItems='center'; leftSetCell.style.gap='8px';
+leftSetCell.style.padding='6px 0'; leftSetCell.innerHTML = '<div class="label">套裝</div>';
+const leftSelectWrap = document.createElement('div'); leftSelectWrap.style.width='54%';
+const leftSelect = document.createElement('select'); leftSelect.id='set-L'; leftSelect.className='select-wide';
+leftSelect.innerHTML = `
+  <option value="none">無套裝效果</option>
+  <option value="tracker4">追蹤者四件套 (+65% 弱點傷害)</option>
+  <option value="avenger2">復仇者兩件套 (+15% 傷害量)</option>
+  <option value="avenger4">復仇者四件套 (+30% 傷害量)</option>
+  <option value="avenger4Boss">復仇者四件套(攻擊 BOSS) (+70% 傷害量)</option>
+`;
+leftSelectWrap.appendChild(leftSelect); leftSetCell.appendChild(leftSelectWrap);
+grid.appendChild(leftSetCell);
+
+// middle empty
+const emptyMid = document.createElement('div'); grid.appendChild(emptyMid);
+
+// right select cell
+const rightSetCell = document.createElement('div'); rightSetCell.style.display='flex'; rightSetCell.style.alignItems='center'; rightSetCell.style.gap='8px';
+rightSetCell.style.padding='6px 0'; rightSetCell.innerHTML = '<div class="label">套裝</div>';
+const rightSelectWrap = document.createElement('div'); rightSelectWrap.style.width='54%';
+const rightSelect = document.createElement('select'); rightSelect.id='set-R'; rightSelect.className='select-wide';
+rightSelect.innerHTML = leftSelect.innerHTML;
+rightSelectWrap.appendChild(rightSelect); rightSetCell.appendChild(rightSelectWrap);
+grid.appendChild(rightSetCell);
+
+/* append BUFF / PET / ENEMY headers and rows were added earlier via SECTIONS iteration */
+
+/* --- Core sync logic --- */
+function $(id){ return document.getElementById(id); }
+
+const allFields = [];
+SECTIONS.forEach(s => s.fields.forEach(f => allFields.push(f)));
+
+allFields.forEach(f => {
+  const L = $(f.id + '-L');
+  const R = $(f.id + '-R');
+  const D = $(f.id + '-D');
+
+  // initial: R synced to L
+  R.dataset.synced = 'true';
+  R.classList.add('gray');
+
+  // left input change -> if R synced and D empty, copy value
+  L.addEventListener('input', () => {
+    if((!D.value || D.value === '') && (R.dataset.synced === 'true' || R.value === '')) {
+      R.value = L.value;
+      R.dataset.synced = 'true';
+      R.classList.add('gray');
+    }
+    recalcAll();
+  });
+
+  // diff change -> if empty: sync; else set R = L + diff & unsync
+  D.addEventListener('input', () => {
+    const base = parseFloat(L.value) || 0;
+    const delta = parseFloat(D.value);
+    if(!D.value || D.value === '' || isNaN(delta)) {
+      R.value = L.value;
+      R.dataset.synced = 'true';
+      R.classList.add('gray');
+    } else {
+      R.value = base + delta;
+      R.dataset.synced = 'false';
+      R.classList.remove('gray');
+    }
+    recalcAll();
+  });
+
+  // right manual edit -> if same as left and D empty -> remain synced; else unsync
+  R.addEventListener('input', () => {
+    const lv = (L.value === '') ? '' : String(Number(L.value));
+    const rv = (R.value === '') ? '' : String(Number(R.value));
+    if(rv === '') {
+      R.dataset.synced = 'true';
+      R.value = L.value;
+      R.classList.add('gray');
+    } else if(rv === lv && (!D.value || D.value === '')) {
+      R.dataset.synced = 'true';
+      R.classList.add('gray');
+    } else {
+      R.dataset.synced = 'false';
+      R.classList.remove('gray');
+    }
+    recalcAll();
+  });
+});
+
+/* recalc function (use earlier formulas) */
+function readSide(side){
+  // side = 'L' or 'R'
+  const vals = {};
+  allFields.forEach(f => {
+    const el = $(f.id + '-' + side);
+    vals[f.id] = el && el.value !== '' ? parseFloat(el.value) : 0;
+  });
+  vals.set = $( 'set-' + side ).value;
+  return vals;
+}
+
+function compute(vals){
+  const atkPanel = vals.atkPanel || 0;
+  const atkBase = vals.atkBase || 0;
+  const formAtk = (vals.formAtk || 0)/100;
+  const skillRate = (vals.skillRate || 0)/100;
+  const critDmg = (vals.critDmg || 0)/100;
+  const buffAtk = (vals.buffAtk || 0)/100;
+  let weakDmg = (vals.weakDmg || 0)/100;
+  let revenge = (vals.revengeDmg || 0)/100;
+  let ignore = (vals.deffIgnore || 0)/100;
+  const petAtkFlat = vals.petAtkFlat || 0;
+  const petAtkPercent = (vals.petAtkPercent || 0)/100;
+  const petSkillAtk = (vals.petSkillAtk || 0)/100;
+  const petCrit = (vals.petCritDmg || 0)/100;
+  const petDmgInc = (vals.petDmgIncrese || 0)/100;
+  const buffCrit = (vals.buffCritDMG || 0)/100;
+  const deffDown = (vals.deffDown || 0)/100;
+  const enemyDef = vals.enemyDef || 0;
+  const reduceRate = (vals.reduceRate || 0)/100;
+  const enemyDefIncrease = (vals.enemyDefIncrease || 0)/100;
+
+  // apply set
+  switch(vals.set){
+    case 'tracker4': weakDmg += 0.65; break;
+    case 'avenger2': revenge += 0.15; break;
+    case 'avenger4': revenge += 0.30; break;
+    case 'avenger4Boss': revenge += 0.70; break;
+    case 'assassin4': ignore += 0.15; break;
+  }
+
+  const DEF_CONST = 467;
+  const adj = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - ignore);
+  const defRate = (1 - (adj / (DEF_CONST + adj))) * (1 - reduceRate);
+
+  const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
+  const baseDamage = atkTotal * skillRate;
+
+  // crit multiplier: interpret user input as percent e.g. 200 => 2.00
+  const critMultiplier = (critDmg + petCrit + buffCrit); // note: if input 200 -> 2.0
+  const dmgCritOnly = baseDamage * critMultiplier * (1 + revenge + petDmgInc) * defRate;
+  const dmgWeakOnly = baseDamage * (1 + weakDmg) * (1 + revenge + petDmgInc) * defRate;
+  const dmgBoth = baseDamage * critMultiplier * (1 + weakDmg) * (1 + revenge + petDmgInc) * defRate;
+
+  return {dmgCritOnly, dmgWeakOnly, dmgBoth};
+}
+
+function recalcAll(){
+  const valsL = readSide('L'), valsR = readSide('R');
+  const A = compute(valsL), B = compute(valsR);
+
+  $('resA').textContent = `只暴擊：${Math.round(A.dmgCritOnly).toLocaleString()} ｜ 只弱點：${Math.round(A.dmgWeakOnly).toLocaleString()} ｜ 最終：${Math.round(A.dmgBoth).toLocaleString()}`;
+  $('resB').textContent = `只暴擊：${Math.round(B.dmgCritOnly).toLocaleString()} ｜ 只弱點：${Math.round(B.dmgWeakOnly).toLocaleString()} ｜ 最終：${Math.round(B.dmgBoth).toLocaleString()}`;
+
+  let pct = 0;
+  if(A.dmgBoth > 0) pct = ((B.dmgBoth - A.dmgBoth) / A.dmgBoth) * 100;
+  $('resDiff').textContent = `B vs A 差異： ${pct>=0?'+':''}${pct.toFixed(2)}%`;
+}
+
+/* attach change listeners for sets to recalc */
+$('set-L').addEventListener('change', recalcAll);
+$('set-R').addEventListener('change', recalcAll);
+
+/* attach recalc to all inputs */
+allFields.forEach(f => {
+  const ids = [f.id+'-L', f.id+'-R', f.id+'-D'];
+  ids.forEach(id => {
+    const el = $(id);
+    if(el) el.addEventListener('input', recalcAll);
+  });
+});
+
+/* initial fill: copy left->right for all (so right shows gray synced) */
+allFields.forEach(f => {
+  const L = $(f.id+'-L'), R = $(f.id+'-R');
+  if(L && R){
+    R.value = L.value || '';
+    R.dataset.synced = 'true';
+    R.classList.add('gray');
+  }
+});
+
+recalcAll();
+
 </script>
 </body>
 </html>
