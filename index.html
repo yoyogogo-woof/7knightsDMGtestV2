@@ -3,12 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>774 雙裝備比較計算機（含儲存 & 同步修正）</title>
+  <title>774裝備比較&傷害計算機</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 鎖頭圖示 */
+    .lock-icon::after {
+      content: "🔒";
+      position: absolute;
+      top: 3px;
+      right: 4px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center py-8">
 
-  <h1 class="text-3xl font-bold mb-6">774 雙裝備比較計算機</h1>
+  <h1 class="text-3xl font-bold mb-6">774裝備比較&傷害計算機</h1>
 
   <!-- 兩欄主容器 -->
   <div class="flex flex-col md:flex-row gap-6 w-full max-w-6xl justify-center">
@@ -43,46 +54,25 @@
   </div>
 
   <script>
-    // 欄位清單（保留原先所有欄位）
     const fields = [
       'atkPanel', 'atkBase', 'formAtk', 'buffAtk', 'skillRate', 'critDmg',
       'weakDmg', 'revengeDmg', 'petAtkFlat', 'petSkillAtk', 'petCritDmg',
       'petAtkPercent', 'enemyDef', 'reduceRate', 'setEffect','buffCritDMG','deffDown','deffIgnore','enemyDefIncrease','petDmgIncrese'
     ];
 
-    // helper：建立 input html
-    function createInputHtml(id, label, unit = '') {
-      return `
-        <div class="flex justify-between items-center mb-1">
-          <label>${label}</label>
-          <div class="relative w-28">
-            <input id="${id}" type="${id === 'setEffect' ? 'text' : 'number'}" ${id === 'setEffect' ? 'hidden' : ''} class="border rounded p-1.5 w-full text-right pr-6">
-            ${unit ? `<span class="absolute right-2 top-1.5 text-gray-400">${unit}</span>` : ''}
-          </div>
-        </div>
-      `;
-    }
-
-    // 本版使用函式組合原始版面（保留所有段落與下拉）
+    // 建立每個欄位 HTML
     function buildPanelHtml() {
-      // 我們會在 inject 後改變 select 的實體（select 不能用 input type=number），
-      // 所以先保留結構然後再替換為 select。
       return `
-      <section>
-        <h2 class="text-lg font-semibold border-b pb-2 mb-4">【主輸出】</h2>
-        <div class="space-y-2">
-          <div class="flex justify-between items-center"><label>面板攻擊力</label><input id="atkPanel" type="number" class="border rounded p-1.5 w-28 text-right"></div>
-          <div class="flex justify-between items-center"><label>基礎攻擊力</label><input id="atkBase" type="number" class="border rounded p-1.5 w-28 text-right"></div>
-          <div class="flex justify-between items-center"><label>招式倍率</label><div class="relative w-28"><input id="skillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>暴擊傷害</label><div class="relative w-28"><input id="critDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>陣型提升攻擊力</label><div class="relative w-28"><input id="formAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-        </div>
-      <section>
+        <section>
+          <div class="space-y-2">
+            <div class="flex justify-between items-center"><label>面板攻擊力</label><input id="atkPanel" type="number" class="border rounded p-1.5 w-28 text-right"></div>
+            <div class="flex justify-between items-center"><label>基礎攻擊力</label><input id="atkBase" type="number" class="border rounded p-1.5 w-28 text-right"></div>
+            <div class="flex justify-between items-center"><label>招式倍率</label><div class="relative w-28"><input id="skillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
+            <div class="flex justify-between items-center"><label>暴擊傷害</label><div class="relative w-28"><input id="critDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
+            <div class="flex justify-between items-center"><label>陣型提升攻擊力</label><div class="relative w-28"><input id="formAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
+          </div>
 
-      <section>
-        <div class="mt-4 border-t pt-3">
-          <!-- 這裡會被替換成 select -->
-          <div class="relative">
+          <div class="mt-4">
             <select id="setEffect" class="border rounded p-2 w-full">
               <option value="none">無套裝效果</option>
               <option value="tracker4">追蹤者四件套（弱點傷害 +35%）</option>
@@ -92,421 +82,181 @@
               <option value="avenger4Boss">復仇者四件套（BOSS 傷害量 +70%）</option>
             </select>
           </div>
-        </div>
-      </section>
 
-      <section>
-      </div>
-        <h2 class="text-lg font-semibold border-b pb-2 mb-4">【BUFF（選填）】</h2>
-        <div class="space-y-2">
-          <div class="flex justify-between items-center"><label>攻擊力增加</label><div class="relative w-28"><input id="buffAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>弱點傷害量增加</label><div class="relative w-28"><input id="weakDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>傷害量增加</label><div class="relative w-28"><input id="revengeDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>暴擊傷害增加</label><div class="relative w-28"><input id="buffCritDMG" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>減少防禦力</label><div class="relative w-28"><input id="deffDown" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>無視防禦</label><div class="relative w-28"><input id="deffIgnore" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-        </div>
-      </section>
+          <hr class="my-4 border-gray-300">
 
-      <section>
-        <h2 class="text-lg font-semibold border-b pb-2 mb-4">【寵物效果】</h2>
-        <div class="space-y-2">
-          <div class="flex justify-between items-center"><label>寵物攻擊力</label><input id="petAtkFlat" type="number" class="border rounded p-1.5 w-28 text-right"></div>
-          <div class="flex justify-between items-center"><label>潛能：增加攻擊力</label><div class="relative w-28"><input id="petAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>技能：增加攻擊力</label><div class="relative w-28"><input id="petSkillAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>技能：增加暴擊傷害</label><div class="relative w-28"><input id="petCritDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>技能：增加傷害</label><div class="relative w-28"><input id="petDmgIncrese" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-        </div>
-      </section>
+          <h2 class="text-lg font-semibold mb-2">【BUFF（選填）】</h2>
+          <div class="space-y-2">
+            ${inputRow('buffAtk','攻擊力增加','%')}
+            ${inputRow('weakDmg','弱點傷害量增加','%')}
+            ${inputRow('revengeDmg','傷害量增加','%')}
+            ${inputRow('buffCritDMG','暴擊傷害增加','%')}
+            ${inputRow('deffDown','減少防禦力','%')}
+            ${inputRow('deffIgnore','無視防禦','%')}
+          </div>
 
-      <section>
-        <h2 class="text-lg font-semibold border-b pb-2 mb-4">【敵方防禦】</h2>
-        <div class="space-y-2">
-          <div class="flex justify-between items-center"><label>敵方防禦力</label><input id="enemyDef" type="number" class="border rounded p-1.5 w-28 text-right"></div>
-          <div class="flex justify-between items-center"><label>物理/魔法減傷</label><div class="relative w-28"><input id="reduceRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-          <div class="flex justify-between items-center"><label>增加防禦力</label><div class="relative w-28"><input id="enemyDefIncrease" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-        </div>
-      </section>
+          <hr class="my-4 border-gray-300">
+
+          <h2 class="text-lg font-semibold mb-2">【寵物效果】</h2>
+          <div class="space-y-2">
+            ${inputRow('petAtkFlat','寵物攻擊力','')}
+            ${inputRow('petAtkPercent','潛能：增加攻擊力','%')}
+            ${inputRow('petSkillAtk','技能：增加攻擊力','%')}
+            ${inputRow('petCritDmg','技能：增加暴擊傷害','%')}
+            ${inputRow('petDmgIncrese','技能：增加傷害','%')}
+          </div>
+
+          <hr class="my-4 border-gray-300">
+
+          <h2 class="text-lg font-semibold mb-2">【敵方防禦】</h2>
+          <div class="space-y-2">
+            ${inputRow('enemyDef','敵方防禦力','')}
+            ${inputRow('reduceRate','物理/魔法減傷','%')}
+            ${inputRow('enemyDefIncrease','增加防禦力','%')}
+          </div>
+        </section>
       `;
     }
 
-    // 注入 A / B 的完整 HTML（之後再綁定事件）
+    function inputRow(id, label, unit) {
+      return `
+        <div class="flex justify-between items-center">
+          <label>${label}</label>
+          <div class="relative w-28">
+            <input id="${id}" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+            ${unit ? `<span class="absolute right-2 top-1.5 text-gray-400">${unit}</span>` : ''}
+          </div>
+        </div>`;
+    }
+
+    // 注入內容
     document.getElementById('contentA').innerHTML = buildPanelHtml();
     document.getElementById('contentB').innerHTML = buildPanelHtml();
 
-    // helper：取得某區塊內的 element（prefix = 'A' 或 'B'）
-    function el(prefix, id) {
-      return document.querySelector(`#${prefix} #${id}`);
-    }
+    const el = (p,id) => document.querySelector(`#${p} #${id}`);
 
-    // 儲存/載入 localStorage，key 用 prefix_id
-    function saveValue(prefix, id, value) {
-      localStorage.setItem(`${prefix}_${id}`, value === undefined ? '' : String(value));
-    }
-    function loadValue(prefix, id) {
-      return localStorage.getItem(`${prefix}_${id}`);
-    }
+    // localStorage 儲存/載入
+    const save = (p,id,v)=>localStorage.setItem(`${p}_${id}`,v);
+    const load = (p,id)=>localStorage.getItem(`${p}_${id}`);
 
-    // 初始化：把 localStorage 的值寫回 input（若有）
-    function loadAllSaved() {
-      ['A','B'].forEach(prefix=>{
+    function loadSaved() {
+      ['A','B'].forEach(p=>{
         fields.forEach(id=>{
-          const v = loadValue(prefix, id);
-          const node = el(prefix, id);
-          if (!node) return;
-          if (v !== null && v !== undefined) {
-            node.value = v;
-          } else {
-            node.value = '';
-          }
-        });
-      });
-
-      // setEffect 為 select，確認它存在且從 localStorage 還原（若有）
-      ['A','B'].forEach(prefix=>{
-        const sel = el(prefix, 'setEffect');
-        if (sel) {
-          const v = loadValue(prefix, 'setEffect');
-          if (v) sel.value = v;
-        }
-      });
-
-      // 初始判定：若 B 欄某欄位有儲存值，視為使用者已手動編輯（userEdited = true）
-      ['A','B'].forEach(prefix=>{
-        fields.forEach(id=>{
-          const node = el(prefix, id);
-          if (!node) return;
-          const stored = loadValue(prefix, id);
-          if (stored !== null && stored !== '') {
-            // userProvided only for B: if B has stored value -> userEdited true
-            if (prefix === 'B') {
-              node.dataset.userEdited = 'true';
-              node.classList.remove('bg-gray-200');
-            }
-          } else {
-            // empty stored
-            if (prefix === 'B') {
-              node.dataset.userEdited = 'false';
-            }
-          }
+          const v=load(p,id);
+          const node=el(p,id);
+          if(node&&v!==null)node.value=v;
         });
       });
     }
 
-    // 計算公式（完全保留原來邏輯，回傳四種傷害）
+    // 原始公式（不變）
     function calculate(prefix) {
       const v = id => parseFloat(el(prefix, id)?.value) || 0;
-
-      const atkPanel = v('atkPanel');
-      const atkBase = v('atkBase');
-      const formAtk = v('formAtk') / 100;
-      const skillRate = v('skillRate') / 100;
-      const critDmg = v('critDmg') / 100;
-
-      const buffAtk = v('buffAtk') / 100;
-      const weakDmg = (v('weakDmg')+30) / 100;
-      const revengeDmg = v('revengeDmg') / 100;
-      const buffCritDMG = v('buffCritDMG') / 100;
-      const deffDown = v('deffDown')/100;
-      const deffIgnore = v('deffIgnore')/100;
-
-      const petAtkFlat = v('petAtkFlat');
-      const petSkillAtk = v('petSkillAtk') / 100;
-      const petCritDmg = v('petCritDmg') / 100;
-      const petAtkPercent = v('petAtkPercent') / 100;
-      const petDmgIncrese = v('petDmgIncrese') / 100;
-
-      const enemyDef = v('enemyDef');
-      const reduceRate = v('reduceRate') / 100;
-      const enemyDefIncrease = v('enemyDefIncrease') / 100;
-
-      const setEffectNode = el(prefix, 'setEffect');
-      const setEffect = setEffectNode ? setEffectNode.value : 'none';
-
-      let weakDmgTotal = weakDmg;
-      let revengeDmgTotal = revengeDmg;
-      let deffIgnoreTotal = deffIgnore;
-
-      switch (setEffect) {
-        case 'tracker4':
-          weakDmgTotal += 0.35;
-          break;
-        case 'avenger2':
-          revengeDmgTotal += 0.15;
-          break;
-        case 'avenger4':
-          revengeDmgTotal += 0.30;
-          break;
-        case 'avenger4Boss':
-          revengeDmgTotal += 0.70;
-          break;
-        case 'assassin4':
-          deffIgnoreTotal += 0.15;
-          break;
-        default:
-          break;
+      const atkPanel=v('atkPanel'),atkBase=v('atkBase'),formAtk=v('formAtk')/100,skillRate=v('skillRate')/100,critDmg=v('critDmg')/100;
+      const buffAtk=v('buffAtk')/100,weakDmg=(v('weakDmg')+30)/100,revengeDmg=v('revengeDmg')/100,buffCritDMG=v('buffCritDMG')/100,deffDown=v('deffDown')/100,deffIgnore=v('deffIgnore')/100;
+      const petAtkFlat=v('petAtkFlat'),petSkillAtk=v('petSkillAtk')/100,petCritDmg=v('petCritDmg')/100,petAtkPercent=v('petAtkPercent')/100,petDmgIncrese=v('petDmgIncrese')/100;
+      const enemyDef=v('enemyDef'),reduceRate=v('reduceRate')/100,enemyDefIncrease=v('enemyDefIncrease')/100;
+      const setEffect=el(prefix,'setEffect').value;
+      let weakDmgTotal=weakDmg,revengeDmgTotal=revengeDmg,deffIgnoreTotal=deffIgnore;
+      switch(setEffect){
+        case'tracker4':weakDmgTotal+=0.35;break;
+        case'avenger2':revengeDmgTotal+=0.15;break;
+        case'avenger4':revengeDmgTotal+=0.30;break;
+        case'avenger4Boss':revengeDmgTotal+=0.70;break;
+        case'assassin4':deffIgnoreTotal+=0.15;break;
       }
-
-      const DEF_CONST = 467;
-      const defRate = (1 - ( (enemyDef * (1-deffDown+enemyDefIncrease) * (1-deffIgnoreTotal) ) / (DEF_CONST + (enemyDef * (1-deffDown+enemyDefIncrease) * (1-deffIgnoreTotal) )))) * (1 - reduceRate);
-
-      const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
-
-      const dmgCritOnly = atkTotal
-        * skillRate
-        * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) // 暴擊加成
-        * (1 + revengeDmgTotal + petDmgIncrese)
-        * defRate;
-
-      const dmgWeakOnly = atkTotal
-        * skillRate
-        * (1 + weakDmgTotal)
-        * (1 + revengeDmgTotal + petDmgIncrese)
-        * defRate;
-
-      const dmgBoth = atkTotal
-        * skillRate
-        * (1 + (critDmg + petCritDmg + buffCritDMG - 1))
-        * (1 + weakDmgTotal)
-        * (1 + revengeDmgTotal + petDmgIncrese)
-        * defRate;
-
-      const nono = atkTotal
-        * skillRate
-        * (1 + revengeDmgTotal + petDmgIncrese);
-
-      return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth };
+      const DEF_CONST=467;
+      const defRate=(1-((enemyDef*(1-deffDown+enemyDefIncrease)*(1-deffIgnoreTotal))/(DEF_CONST+(enemyDef*(1-deffDown+enemyDefIncrease)*(1-deffIgnoreTotal)))))*(1-reduceRate);
+      const atkTotal=(atkPanel+atkBase*(formAtk+petAtkPercent)+petAtkFlat)*(1+buffAtk+petSkillAtk);
+      const dmgCritOnly=atkTotal*skillRate*(1+(critDmg+petCritDmg+buffCritDMG-1))*(1+revengeDmgTotal+petDmgIncrese)*defRate;
+      const dmgWeakOnly=atkTotal*skillRate*(1+weakDmgTotal)*(1+revengeDmgTotal+petDmgIncrese)*defRate;
+      const dmgBoth=atkTotal*skillRate*(1+(critDmg+petCritDmg+buffCritDMG-1))*(1+weakDmgTotal)*(1+revengeDmgTotal+petDmgIncrese)*defRate;
+      const nono=atkTotal*skillRate*(1+revengeDmgTotal+petDmgIncrese);
+      return{nono,dmgCritOnly,dmgWeakOnly,dmgBoth};
     }
 
-    // 顯示結果（四種傷害）
-    function showResult(prefix, data) {
-      const target = document.getElementById(`result${prefix}`);
-      if (!data || !data.dmgBoth || data.dmgBoth <= 0) {
-        target.innerHTML = `<span class="text-gray-400">請輸入完整數值</span>`;
-        return;
-      }
-      target.innerHTML = `
-        <div class="space-y-2">
-          <p><b>無暴擊弱點：</b> ${Math.round(data.nono).toLocaleString()}</p>
-          <p><b>只觸發暴擊：</b> ${Math.round(data.dmgCritOnly).toLocaleString()}</p>
-          <p><b>只觸發弱點：</b> ${Math.round(data.dmgWeakOnly).toLocaleString()}</p>
-          <p><b>暴擊＋弱點：</b> <span class="text-blue-600 font-bold">${Math.round(data.dmgBoth).toLocaleString()}</span></p>
-        </div>
-      `;
+    function showResult(prefix,d){
+      const t=document.getElementById(`result${prefix}`);
+      if(!d||!d.dmgBoth||d.dmgBoth<=0){t.innerHTML=`<span class='text-gray-400'>請輸入完整數值</span>`;return;}
+      t.innerHTML=`
+      <div class="space-y-2">
+        <p><b>無暴擊弱點：</b>${Math.round(d.nono).toLocaleString()}</p>
+        <p><b>只觸發暴擊：</b>${Math.round(d.dmgCritOnly).toLocaleString()}</p>
+        <p><b>只觸發弱點：</b>${Math.round(d.dmgWeakOnly).toLocaleString()}</p>
+        <p><b>暴擊＋弱點：</b><span class="text-blue-600 font-bold">${Math.round(d.dmgBoth).toLocaleString()}</span></p>
+      </div>`;
     }
 
-    // 顯示差異
-    function showDiff(a, b) {
-      const res = document.getElementById('compareResult');
-      if (!a || !b) { res.innerText = '請輸入完整數值'; return; }
-      const diff = ((b - a) / a) * 100;
-      const sign = diff >= 0 ? '多' : '少';
-      const absVal = Math.abs(diff).toFixed(2);
-      // 使用色彩 class（簡單處理）
-      const color = diff >= 0 ? 'text-green-600' : 'text-red-600';
-      res.innerHTML = `B 比 A <span class="${color} font-bold">${sign}${absVal}%</span>`;
+    function showDiff(a,b){
+      const res=document.getElementById('compareResult');
+      if(!a||!b){res.innerText='請輸入完整數值';return;}
+      const diff=((b-a)/a)*100;
+      const sign=diff>=0?'多':'少';
+      const color=diff>=0?'text-green-600':'text-red-600';
+      res.innerHTML=`B 比 A <span class="${color} font-bold">${sign}${Math.abs(diff).toFixed(2)}%</span>`;
     }
 
-    // 同步邏輯（修正 bug）
-    // 規則：
-    // - 若 B 欄位有 dataset.userEdited == 'true'，則不會被覆蓋
-    // - 若 B 欄位沒有 userEdited（或為 'false'），則自動跟隨 A（並加上 bg-gray-200 與 dataset.autoSynced = 'true'）
-    // - 當使用者在 B 輸入任意內容（input event）時，將 dataset.userEdited = 'true' 並移除 autoSynced
-    function syncFromAtoBField(id) {
-      const aNode = el('A', id);
-      const bNode = el('B', id);
-      if (!aNode || !bNode) return;
+    // --- 同步邏輯 ---
+    function syncFromAtoB(id){
+      const a=el('A',id),b=el('B',id);
+      if(!a||!b)return;
+      if(b.dataset.userEdited==='true'&&b.value!=='')return;
+      b.value=a.value;
+      b.dataset.autoSynced='true';
+      b.classList.add('bg-gray-200','lock-icon');
+      save('B',id,b.value);
+    }
 
-      // 如果 b 被使用者手動編輯過，跳過
-      if (bNode.dataset.userEdited === 'true') {
-        // 使用者編輯過，不自動覆蓋
-        // 但如果使用者手動把 b 清空，則視為放棄手動編輯，恢復 auto sync:
-        if (bNode.value === '') {
-          bNode.dataset.userEdited = 'false';
-          // 接著 fallthrough 讓下面自動填入 a 的值
-        } else {
-          return;
+    function syncAll(){
+      fields.forEach(id=>syncFromAtoB(id));
+    }
+
+    // --- 事件 ---
+    function onInput(e){
+      const n=e.target,p=n.closest('#A')?'A':'B';
+      save(p,n.id,n.value);
+      if(p==='A')syncFromAtoB(n.id);
+      if(p==='B'){
+        if(n.value!==''){
+          n.dataset.userEdited='true';
+          n.classList.remove('bg-gray-200','lock-icon');
+        }else{
+          n.dataset.userEdited='false';
+          syncFromAtoB(n.id);
         }
       }
-
-      // 走到這裡，代表可以自動同步（b 沒有 userEdited 或已清空）
-      // 直接把 a 的完整值同步過去（不會只取第一個字）
-      bNode.value = aNode.value;
-      bNode.dataset.autoSynced = 'true';
-      bNode.classList.add('bg-gray-200');
-
-      // 儲存 B 的 auto 值到 localStorage（讓刷新後仍能回復）
-      saveValue('B', id, bNode.value);
+      updateDisplay();
     }
 
-    // 全域同步（逐欄位）
-    function syncAllEmptyOrAuto() {
-      fields.forEach(id => syncFromAtoBField(id));
-      // 同步下拉 select（套裝效果）
-      const aSel = el('A', 'setEffect');
-      const bSel = el('B', 'setEffect');
-      if (aSel && bSel) {
-        if (bSel.dataset.userEdited === 'true') {
-          if (bSel.value === '') {
-            bSel.dataset.userEdited = 'false';
-          } else {
-            // user edited -> skip
-          }
-        }
-        if (bSel.dataset.userEdited !== 'true') {
-          bSel.value = aSel.value;
-          bSel.dataset.autoSynced = 'true';
-          bSel.classList.add('bg-gray-200');
-          saveValue('B', 'setEffect', bSel.value);
-        }
-      }
+    function updateDisplay(){
+      syncAll();
+      const A=calculate('A'),B=calculate('B');
+      showResult('A',A);showResult('B',B);
+      if(!A.dmgBoth||!B.dmgBoth){document.getElementById('compareResult').innerText='請輸入完整數值';return;}
+      showDiff(A.dmgBoth,B.dmgBoth);
     }
 
-    // 當任一輸入被使用者操作時要做的事（儲存、標記、更新結果）
-    function onInputChange(e) {
-      const node = e.target;
-      // 判斷 node 屬於哪個 prefix
-      const prefix = node.closest('#A') ? 'A' : (node.closest('#B') ? 'B' : null);
-      if (!prefix) return;
-
-      // 對 B 的輸入：如果使用者真的修改（event 是 input），且 node 屬於 B，並且輸入非空 -> 標成 userEdited
-      if (prefix === 'B') {
-        if (node.value !== '') {
-          // user actively typed something => mark as userEdited
-          node.dataset.userEdited = 'true';
-          // remove autoSynced marker if any
-          delete node.dataset.autoSynced;
-          node.classList.remove('bg-gray-200');
-        } else {
-          // user cleared the field -> mark userEdited false (allow auto sync)
-          node.dataset.userEdited = 'false';
-          // do not auto-add bg here; syncAll will fill from A and set bg
-        }
-      }
-
-      // 對 A 的輸入：每次改變都嘗試同步到 B（但 syncFromAtoBField 會檢查 b 的 userEdited）
-      if (prefix === 'A') {
-        // 儲存 A 的值
-        const fieldId = node.id;
-        saveValue('A', fieldId, node.value);
-        // 嘗試同步該欄
-        syncFromAtoBField(node.id);
-      } else {
-        // prefix === 'B' -> 儲存 B 的值
-        saveValue('B', node.id, node.value);
-      }
-
-      // 若是 select（setEffect），也需要儲存與同步
-      if (node.tagName === 'SELECT') {
-        saveValue(prefix, node.id, node.value);
-        if (prefix === 'A') {
-          // try sync select to B
-          syncAllEmptyOrAuto();
-        }
-      }
-
-      // 最後重新計算與顯示
-      updateAllDisplays();
-    }
-
-    // 更新兩邊顯示與比較
-    function updateAllDisplays() {
-      // 先做同步（保證 B 跟 A 同步的欄位先更新）
-      syncAllEmptyOrAuto();
-
-      const dataA = calculate('A');
-      const dataB = calculate('B');
-
-      showResult('A', dataA);
-      showResult('B', dataB);
-
-      // 如果任一方沒有有效 dmgBoth，顯示請輸入完整
-      if (!dataA.dmgBoth || !dataB.dmgBoth) {
-        document.getElementById('compareResult').innerText = '請輸入完整數值';
-      } else {
-        showDiff(dataA.dmgBoth, dataB.dmgBoth);
-      }
-    }
-
-    // 為所有 input/select 綁定事件（包含 A 與 B）
-    function bindEvents() {
-      // inputs & selects in both A and B
-      document.querySelectorAll('#A input, #A select, #B input, #B select').forEach(node=>{
-        // 普通 input/select 的 input 事件
-        node.addEventListener('input', onInputChange);
-        // 當 focus 到 B 的 autoSynced 欄位且使用者想要輸入時（focus），如果該欄目前是 autoSynced，我們把它視為 "user 開始編輯"：
-        node.addEventListener('focus', (e) => {
-          const n = e.target;
-          if (n.closest('#B')) {
-            // 如果是 B 的欄位，且目前 autoSynced 為 true，當使用者 focus 並開打字，input handler 會把 userEdited 設為 true
-            // 但有時使用者是想覆蓋 auto 值，因此在 focus 時也移除 autoSynced 視覺
-            if (n.dataset.autoSynced === 'true') {
-              // do not immediately mark as userEdited, wait until input if they actually type
-              // but remove gray bg on focus to show they're editing
-              n.classList.remove('bg-gray-200');
-            }
-          }
-        });
+    // Reset
+    function resetAll(){
+      if(!confirm('確定要清除所有數值嗎？'))return;
+      ['A','B'].forEach(p=>fields.forEach(id=>localStorage.removeItem(`${p}_${id}`)));
+      document.querySelectorAll('input,select').forEach(i=>{
+        i.value='';i.classList.remove('bg-gray-200','lock-icon');i.dataset.userEdited='false';
       });
+      document.getElementById('resultA').innerText='請輸入數值';
+      document.getElementById('resultB').innerText='請輸入數值';
+      document.getElementById('compareResult').innerText='請輸入完整數值';
     }
 
-    // reset function（清除 localStorage 與表單）
-    function resetAll() {
-      if (!confirm('確定要清除所有數值嗎？')) return;
-      // 清 localStorage keys for A_ and B_
-      ['A','B'].forEach(prefix=>{
-        fields.forEach(id=>{
-          localStorage.removeItem(`${prefix}_${id}`);
-        });
-        localStorage.removeItem(`${prefix}_setEffect`);
-      });
-
-      // 清空 inputs and metadata
-      document.querySelectorAll('#A input, #A select, #B input, #B select').forEach(n=>{
-        n.value = '';
-        delete n.dataset.autoSynced;
-        delete n.dataset.userEdited;
-        n.classList.remove('bg-gray-200');
-      });
-
-      document.getElementById('resultA').innerText = '請輸入數值';
-      document.getElementById('resultB').innerText = '請輸入數值';
-      document.getElementById('compareResult').innerText = '請輸入完整數值';
-    }
-
-    // --- 初始化流程 ---
-    // 1. 載入儲存值
-    loadAllSaved();
-
-    // 2. 綁定事件
-    bindEvents();
-
-    // 3. 初次做一次同步 & 顯示（如果 B 是空的會自動同步 A）
-    // 注意：若頁面載入後 A 有值，而 B 沒值，會把 A 的值複製到 B 並加上 autoSynced 標記
-    syncAllEmptyOrAuto();
-
-    // 4. 顯示目前計算結果（若有）
-    updateAllDisplays();
-
-    // 5. reset button
-    document.getElementById('resetBtn').addEventListener('click', resetAll);
-
-    // 6. 儲存：當 page 關閉前（或 reload）把所有現有值保存（作為補償）
-    window.addEventListener('beforeunload', ()=>{
-      ['A','B'].forEach(prefix=>{
-        fields.forEach(id=>{
-          const node = el(prefix, id);
-          if (node) saveValue(prefix, id, node.value);
-        });
-        const sel = el(prefix, 'setEffect');
-        if (sel) saveValue(prefix, 'setEffect', sel.value);
-      });
+    // 初始化
+    loadSaved();
+    document.querySelectorAll('input,select').forEach(i=>{
+      i.addEventListener('input',onInput);
+      i.dataset.userEdited='false';
     });
-
-    // 額外：當使用者在 A 輸入時，即時同步該欄並且儲存 A、B 的值（onInputChange 已在 input event 儲存 A/B）
-    // 當使用者在 B 輸入時，onInputChange 也會把 B 的值儲存並標記為 userEdited
-
+    syncAll();
+    updateDisplay();
+    document.getElementById('resetBtn').addEventListener('click',resetAll);
   </script>
 </body>
 </html>
-
