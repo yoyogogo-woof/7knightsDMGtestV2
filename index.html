@@ -1,237 +1,402 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>雙欄裝備比較</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>傷害計算器（雙欄比較）</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  input[type="number"]::-webkit-inner-spin-button {
-    opacity: 1;
-  }
-  .input-box {
-    text-align: right;
-    padding-right: 22px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    height: 30px;
-    width: 100%;
-  }
-  .gray-input {
-    background-color: #f3f4f6;
-  }
-  .percent-box {
-    position: relative;
-  }
-  .percent-box::after {
-    content: "%";
-    position: absolute;
-    right: 8px;
-    top: 4px;
-    color: #555;
-    font-size: 0.9rem;
-  }
-  .diff-box {
-    text-align: right;
-    padding-right: 18px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    height: 30px;
-    background-color: #fff;
-  }
-  .diff-box::after {
-    content: "%";
-    position: absolute;
-    right: 6px;
-    color: #666;
-  }
-  .section-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
-  }
+  /* 基本 */
+  body { background:#f3f4f6; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+  .card { background:#fff; border-radius:12px; padding:14px; box-shadow:0 6px 18px rgba(15,23,42,0.06); width:320px; }
+  .title { font-weight:600; margin-bottom:8px; }
+  .row { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+  .label { white-space:nowrap; font-size:14px; color:#111827; width:42%; }
+  /* input 統一高度與右對齊 */
+  .input { height:34px; border:1px solid #e5e7eb; border-radius:8px; padding:6px 10px; text-align:right; width:56%; background:white; }
+  .input.gray { background:#f3f4f6; }
+  /* 百分比內嵌 % */
+  .percent { position:relative; }
+  .percent input.input { padding-right:34px; }
+  .percent .pct { position:absolute; right:10px; top:50%; transform:translateY(-50%); color:#6b7280; pointer-events:none; }
+  /* 中間 diff 欄 */
+  .diff-col { width:86px; display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:2px; }
+  .diff { width:72px; height:34px; border:1px solid #e5e7eb; border-radius:8px; text-align:right; padding-right:26px; background:white; }
+  .diff.percent { position:relative; padding-right:34px; }
+  .diff-percent-mark { position:absolute; right:8px; top:50%; transform:translateY(-50%); color:#6b7280; pointer-events:none; }
+  /* 小字與結果 */
+  .section-title { font-weight:600; margin-top:8px; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+  .result-card { width:720px; background:white; border-radius:12px; padding:12px; margin-top:18px; box-shadow:0 6px 18px rgba(15,23,42,0.06); }
+  .small-note { font-size:13px; color:#6b7280; }
 </style>
 </head>
+<body class="flex flex-col items-center py-8">
 
-<body class="bg-gray-100 flex flex-col items-center py-6">
-  <div class="flex gap-10">
-    <!-- 左欄 -->
-    <div id="leftPanel" class="bg-white shadow rounded-2xl p-4 w-[320px]">
-      <h3 class="section-title">🛠 主輸出</h3>
-      <div class="grid gap-2" id="mainOutputLeft"></div>
+  <h1 class="text-2xl font-bold mb-6">傷害計算器</h1>
 
-      <h3 class="section-title">✨ BUFF（選填）</h3>
-      <div class="grid gap-2" id="buffLeft"></div>
+  <div class="flex items-start gap-6">
+    <!-- LEFT CARD -->
+    <div id="leftCard" class="card">
+      <div class="title">🛠 主輸出</div>
+      <div id="left-main"></div>
 
-      <h3 class="section-title">🐉 寵物</h3>
-      <div class="grid gap-2" id="petLeft"></div>
+      <div class="section-title">💎 套裝效果</div>
+      <div class="row">
+        <div class="label">套裝</div>
+        <select id="set-left" class="input">
+          <option value="none">無套裝效果</option>
+          <option value="tracker4">追蹤者四件套（弱點傷害 +65%）</option>
+          <option value="avenger2">復仇者兩件套（傷害量 +15%）</option>
+          <option value="avenger4">復仇者四件套（傷害量 +30%）</option>
+          <option value="avenger4Boss">復仇者四件套（BOSS 傷害量 +70%）</option>
+        </select>
+      </div>
 
-      <h3 class="section-title">🛡 敵人</h3>
-      <div class="grid gap-2" id="enemyLeft"></div>
+      <div class="section-title">✨ BUFF（選填）</div>
+      <div id="left-buff"></div>
+
+      <div class="section-title">🐉 寵物</div>
+      <div id="left-pet"></div>
+
+      <div class="section-title">🛡 敵人</div>
+      <div id="left-enemy"></div>
+
+      <div class="section-title mt-3">📊 結果</div>
+      <div id="result-left" class="small-note">請輸入數值</div>
     </div>
 
-    <!-- 中間差值欄 -->
-    <div id="diffPanel" class="flex flex-col justify-start mt-9 gap-[14px] w-[70px] text-center"></div>
+    <!-- MIDDLE DIFF -->
+    <div id="diffCol" class="diff-col" aria-hidden="true"></div>
 
-    <!-- 右欄 -->
-    <div id="rightPanel" class="bg-white shadow rounded-2xl p-4 w-[320px]">
-      <h3 class="section-title">🛠 主輸出</h3>
-      <div class="grid gap-2" id="mainOutputRight"></div>
+    <!-- RIGHT CARD -->
+    <div id="rightCard" class="card">
+      <div class="title">🛠 主輸出</div>
+      <div id="right-main"></div>
 
-      <h3 class="section-title">✨ BUFF（選填）</h3>
-      <div class="grid gap-2" id="buffRight"></div>
+      <div class="section-title">💎 套裝效果</div>
+      <div class="row">
+        <div class="label">套裝</div>
+        <select id="set-right" class="input">
+          <option value="none">無套裝效果</option>
+          <option value="tracker4">追蹤者四件套（弱點傷害 +65%）</option>
+          <option value="avenger2">復仇者兩件套（傷害量 +15%）</option>
+          <option value="avenger4">復仇者四件套（傷害量 +30%）</option>
+          <option value="avenger4Boss">復仇者四件套（BOSS 傷害量 +70%）</option>
+        </select>
+      </div>
 
-      <h3 class="section-title">🐉 寵物</h3>
-      <div class="grid gap-2" id="petRight"></div>
+      <div class="section-title">✨ BUFF（選填）</div>
+      <div id="right-buff"></div>
 
-      <h3 class="section-title">🛡 敵人</h3>
-      <div class="grid gap-2" id="enemyRight"></div>
+      <div class="section-title">🐉 寵物</div>
+      <div id="right-pet"></div>
+
+      <div class="section-title">🛡 敵人</div>
+      <div id="right-enemy"></div>
+
+      <div class="section-title mt-3">📊 結果</div>
+      <div id="result-right" class="small-note">請輸入數值</div>
     </div>
   </div>
 
-  <!-- 結果顯示 -->
-  <div class="bg-white shadow rounded-2xl p-4 mt-8 w-[720px] text-center">
-    <h3 class="text-lg font-semibold mb-3">📊 計算結果</h3>
-    <p id="leftResult" class="text-gray-700 mb-1"></p>
-    <p id="rightResult" class="text-gray-700 mb-1"></p>
-    <p id="compareResult" class="font-semibold mt-2"></p>
+  <!-- bottom overall result compare -->
+  <div id="compareCard" class="result-card">
+    <div class="text-lg font-semibold">總計算結果</div>
+    <div id="leftSummary" class="small-note mt-2"></div>
+    <div id="rightSummary" class="small-note mt-1"></div>
+    <div id="diffSummary" class="font-semibold mt-2"></div>
   </div>
 
 <script>
-const fields = [
-  { name: "面板攻擊力", type: "number" },
-  { name: "基礎攻擊力", type: "number" },
-  { name: "招式倍率", type: "percent" },
-  { name: "暴擊傷害", type: "percent" },
-  { name: "陣型提升攻擊力", type: "percent" },
-  { name: "攻擊力增加", type: "percent", section: "buff" },
-  { name: "弱點傷害增加", type: "percent", section: "buff" },
-  { name: "傷害量增加", type: "percent", section: "buff" },
-  { name: "暴擊傷害增加", type: "percent", section: "buff" },
-  { name: "減少防禦力", type: "percent", section: "buff" },
-  { name: "無視防禦", type: "percent", section: "buff" },
-  { name: "寵物攻擊力", type: "number", section: "pet" },
-  { name: "敵方防禦力", type: "number", section: "enemy" },
-  { name: "物理/魔法減傷", type: "percent", section: "enemy" },
-  { name: "增加防禦力", type: "percent", section: "enemy" },
+/* ===== fields 定義（順序會決定顯示順序、也影響對齊） =====
+   每項: id (key), label, type ('number'|'percent'), section ('main'|'buff'|'pet'|'enemy')
+*/
+const FIELDS = [
+  { id:'atkPanel', label:'面板攻擊力', type:'number', section:'main' },
+  { id:'atkBase',  label:'基礎攻擊力', type:'number', section:'main' },
+  { id:'skillRate',label:'招式倍率', type:'percent', section:'main' },
+  { id:'critDmg',  label:'暴擊傷害', type:'percent', section:'main' },
+  { id:'formAtk',  label:'陣型提升攻擊力', type:'percent', section:'main' },
+
+  { id:'buffAtk',  label:'攻擊力增加', type:'percent', section:'buff' },
+  { id:'weakDmg',  label:'弱點傷害量增加', type:'percent', section:'buff' },
+  { id:'revengeDmg',label:'傷害量增加', type:'percent', section:'buff' },
+  { id:'buffCritDMG',label:'暴擊傷害增加', type:'percent', section:'buff' },
+  { id:'deffDown', label:'減少防禦力', type:'percent', section:'buff' },
+  { id:'deffIgnore',label:'無視防禦', type:'percent', section:'buff' },
+
+  { id:'petAtkFlat', label:'寵物攻擊力', type:'number', section:'pet' },
+  { id:'petAtkPercent', label:'潛能：增加攻擊力', type:'percent', section:'pet' },
+  { id:'petSkillAtk', label:'技能：增加攻擊力', type:'percent', section:'pet' },
+  { id:'petCritDmg', label:'技能：增加暴擊傷害', type:'percent', section:'pet' },
+  { id:'petDmgIncrese', label:'技能：增加傷害', type:'percent', section:'pet' },
+
+  { id:'enemyDef', label:'敵方防禦力', type:'number', section:'enemy' },
+  { id:'reduceRate', label:'物理/魔法減傷', type:'percent', section:'enemy' },
+  { id:'enemyDefIncrease', label:'增加防禦力', type:'percent', section:'enemy' },
 ];
 
-function createRow(field, index) {
-  const leftDiv = document.getElementById(field.section ? `${field.section}Left` : "mainOutputLeft");
-  const rightDiv = document.getElementById(field.section ? `${field.section}Right` : "mainOutputRight");
-  const diffDiv = document.getElementById("diffPanel");
+/* helper - create DOM rows in left/mid/right in same order to keep perfect alignment */
+function buildUI() {
+  const leftMain = document.getElementById('left-main');
+  const leftBuff = document.getElementById('left-buff');
+  const leftPet  = document.getElementById('left-pet');
+  const leftEn   = document.getElementById('left-enemy');
+  const rightMain = document.getElementById('right-main');
+  const rightBuff = document.getElementById('right-buff');
+  const rightPet  = document.getElementById('right-pet');
+  const rightEn   = document.getElementById('right-enemy');
+  const diffCol = document.getElementById('diffCol');
 
-  const leftInput = document.createElement("input");
-  leftInput.type = "number";
-  leftInput.className = `input-box ${field.type === "percent" ? "percent-box" : ""}`;
-  leftInput.id = `left-${index}`;
+  // create arrays to push rows so we can append in order
+  const leftRows = [], rightRows = [], diffRows = [];
 
-  const rightInput = document.createElement("input");
-  rightInput.type = "number";
-  rightInput.className = `input-box gray-input ${field.type === "percent" ? "percent-box" : ""}`;
-  rightInput.id = `right-${index}`;
-
-  const diffInput = document.createElement("input");
-  diffInput.type = "number";
-  diffInput.placeholder = "+/-";
-  diffInput.className = `diff-box ${field.type === "percent" ? "percent-box" : ""}`;
-  diffInput.id = `diff-${index}`;
-
-  function syncRight() {
-    if (diffInput.value === "" && document.activeElement !== rightInput) {
-      rightInput.value = leftInput.value;
-      rightInput.classList.add("gray-input");
+  FIELDS.forEach((f, idx) => {
+    // left row
+    const leftRow = document.createElement('div');
+    leftRow.className = 'row';
+    const lLabel = document.createElement('div'); lLabel.className='label'; lLabel.textContent = f.label;
+    const lWrap = document.createElement('div');
+    lWrap.style.width='56%';
+    if (f.type === 'percent') {
+      const div = document.createElement('div'); div.className='percent'; div.style.width='100%';
+      const inp = document.createElement('input'); inp.className='input'; inp.id=`${f.id}-left`; inp.type='number';
+      div.appendChild(inp);
+      const pct = document.createElement('div'); pct.className='pct'; pct.textContent='%'; div.appendChild(pct);
+      lWrap.appendChild(div);
+    } else {
+      const inp = document.createElement('input'); inp.className='input'; inp.id=`${f.id}-left`; inp.type='number';
+      lWrap.appendChild(inp);
     }
+    leftRow.appendChild(lLabel); leftRow.appendChild(lWrap);
+    leftRows.push({ el:leftRow, section:f.section });
+
+    // diff (middle) row - keep placeholder even for percent (will show %)
+    const diffRow = document.createElement('div');
+    diffRow.style.width = '100%'; diffRow.style.display='flex'; diffRow.style.justifyContent='center';
+    if (f.type === 'percent') {
+      const diffWrapper = document.createElement('div'); diffWrapper.style.position='relative';
+      const dinp = document.createElement('input'); dinp.className='diff percent'; dinp.id=`${f.id}-diff`; dinp.type='number';
+      dinp.style.width='72px'; dinp.style.height='34px'; dinp.style.textAlign='right'; dinp.style.paddingRight='28px';
+      const dmark = document.createElement('div'); dmark.className='diff-percent-mark'; dmark.textContent='%';
+      diffWrapper.appendChild(dinp); diffWrapper.appendChild(dmark);
+      diffRow.appendChild(diffWrapper);
+    } else {
+      const dinp = document.createElement('input'); dinp.className='diff'; dinp.id=`${f.id}-diff`; dinp.type='number';
+      dinp.style.width='72px'; diffRow.appendChild(dinp);
+    }
+    diffRows.push({ el:diffRow, section:f.section });
+
+    // right row
+    const rightRow = document.createElement('div'); rightRow.className='row';
+    const rLabel = document.createElement('div'); rLabel.className='label'; rLabel.textContent = f.label;
+    const rWrap = document.createElement('div'); rWrap.style.width='56%';
+    if (f.type === 'percent') {
+      const div = document.createElement('div'); div.className='percent'; div.style.width='100%';
+      const inp = document.createElement('input'); inp.className='input gray'; inp.id=`${f.id}-right`; inp.type='number';
+      div.appendChild(inp);
+      const pct = document.createElement('div'); pct.className='pct'; pct.textContent='%'; div.appendChild(pct);
+      rWrap.appendChild(div);
+    } else {
+      const inp = document.createElement('input'); inp.className='input gray'; inp.id=`${f.id}-right`; inp.type='number';
+      rWrap.appendChild(inp);
+    }
+    rightRow.appendChild(rLabel); rightRow.appendChild(rWrap);
+    rightRows.push({ el:rightRow, section:f.section });
+  });
+
+  // append rows but grouped by section to maintain same visual card grouping
+  function appendBySection(rows, containerMap) {
+    // containerMap: { main:elem, buff:elem, pet:elem, enemy:elem }
+    rows.forEach(rowObj => {
+      const sec = rowObj.section || 'main';
+      containerMap[sec].appendChild(rowObj.el);
+    });
   }
 
-  leftInput.addEventListener("input", () => {
-    if (diffInput.value === "") syncRight();
-    updateResult();
-  });
+  appendBySection(leftRows, { main:leftMain, buff:leftBuff, pet:leftPet, enemy:leftEn });
+  appendBySection(diffRows, { main:diffCol, buff:diffCol, pet:diffCol, enemy:diffCol });
+  appendBySection(rightRows, { main:rightMain, buff:rightBuff, pet:rightPet, enemy:rightEn });
+}
 
-  diffInput.addEventListener("input", () => {
-    const base = parseFloat(leftInput.value) || 0;
-    const diff = parseFloat(diffInput.value);
-    if (diffInput.value === "") {
-      rightInput.value = leftInput.value;
-      rightInput.classList.add("gray-input");
-    } else if (!isNaN(diff)) {
-      rightInput.value = base + diff;
-      rightInput.classList.remove("gray-input");
+/* ===== logic: sync, diff, compute ===== */
+buildUI(); // build inputs
+
+// helper selectors
+function $id(id){return document.getElementById(id);}
+
+// initialize: set right as synced (gray) mirroring left
+FIELDS.forEach(f => {
+  const l = $id(`${f.id}-left`), r = $id(`${f.id}-right`), d = $id(`${f.id}-diff`);
+  // mark r as synced initially
+  r.dataset.synced = 'true';
+  r.classList.add('gray');
+  // event: left input -> if r is synced and diff empty -> copy
+  l.addEventListener('input', () => {
+    if ((d.value === '' || d.value === undefined) && r.dataset.synced === 'true') {
+      r.value = l.value;
+      r.classList.add('gray');
     }
-    updateResult();
+    recalcAll();
   });
-
-  rightInput.addEventListener("input", () => {
-    if (rightInput.value !== leftInput.value) {
-      rightInput.classList.remove("gray-input");
+  // event: diff input -> compute r = left + diff OR clear -> sync
+  d.addEventListener('input', () => {
+    const base = parseFloat(l.value) || 0;
+    const delta = parseFloat(d.value);
+    if (d.value === '' || isNaN(delta)) {
+      // restore sync
+      r.value = l.value;
+      r.dataset.synced = 'true';
+      r.classList.add('gray');
     } else {
-      rightInput.classList.add("gray-input");
+      r.value = (base + delta);
+      r.dataset.synced = 'false';
+      r.classList.remove('gray');
     }
-    updateResult();
+    recalcAll();
+  });
+  // event: right manual input -> mark unsynced if different from left
+  r.addEventListener('input', () => {
+    const lv = (l.value === '') ? '' : String(parseFloat(l.value) || 0);
+    const rv = (r.value === '') ? '' : String(parseFloat(r.value) || 0);
+    if (rv === '') {
+      // empty -> sync
+      r.dataset.synced = 'true';
+      r.value = l.value;
+      r.classList.add('gray');
+    } else if (rv === lv && d.value === '') {
+      r.dataset.synced = 'true';
+      r.classList.add('gray');
+    } else {
+      r.dataset.synced = 'false';
+      r.classList.remove('gray');
+    }
+    recalcAll();
+  });
+});
+
+// set handlers for setEffect selects
+$id('set-left').addEventListener('change', recalcAll);
+$id('set-right').addEventListener('change', recalcAll);
+
+/* ===== calculation function (follows earlier formula logic) ===== */
+function readSide(side) {
+  // gather all values into an object; side: 'left'|'right'
+  const obj = {};
+  FIELDS.forEach(f => {
+    const v = $id(`${f.id}-${side}`).value;
+    obj[f.id] = (v === '') ? 0 : parseFloat(v);
+  });
+  obj.setEffect = $id(`set-${side}`).value;
+  return obj;
+}
+
+function computeDamage(vals) {
+  // vals is object with numeric fields (percent fields are raw percents like 150 for 150%)
+  const atkPanel = vals.atkPanel || 0;
+  const atkBase  = vals.atkBase || 0;
+  const formAtk = (vals.formAtk || 0) / 100;
+  const skillRate = (vals.skillRate || 0) / 100;
+  const critDmg = (vals.critDmg || 0) / 100; // we'll use critDmg as fraction (e.g. 1.5 for +150%? careful below)
+  const buffAtk = (vals.buffAtk || 0) / 100;
+  const weakDmg = (vals.weakDmg || 0) / 100;
+  const revengeDmg = (vals.revengeDmg || 0) / 100;
+  const buffCritDMG = (vals.buffCritDMG || 0) / 100;
+  const deffDown = (vals.deffDown || 0) / 100;
+  const deffIgnore = (vals.deffIgnore || 0) / 100;
+  const petAtkFlat = vals.petAtkFlat || 0;
+  const petSkillAtk = (vals.petSkillAtk || 0) / 100;
+  const petCritDmg = (vals.petCritDmg || 0) / 100;
+  const petAtkPercent = (vals.petAtkPercent || 0) / 100;
+  const petDmgIncrese = (vals.petDmgIncrese || 0) / 100;
+  const enemyDef = vals.enemyDef || 0;
+  const reduceRate = (vals.reduceRate || 0) / 100;
+  const enemyDefIncrease = (vals.enemyDefIncrease || 0) / 100;
+
+  // apply set effect
+  let weakDmgTotal = weakDmg;
+  let revengeDmgTotal = revengeDmg;
+  let deffIgnoreTotal = deffIgnore;
+  switch ((vals.setEffect||'none')) {
+    case 'tracker4': weakDmgTotal += 0.65; break;
+    case 'avenger2': revengeDmgTotal += 0.15; break;
+    case 'avenger4': revengeDmgTotal += 0.30; break;
+    case 'avenger4Boss': revengeDmgTotal += 0.70; break;
+    case 'assassin4': deffIgnoreTotal += 0.15; break;
+    default: break;
+  }
+
+  // defense rate (same as earlier)
+  const DEF_CONST = 467;
+  const adjEnemyDef = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal);
+  const defRate = (1 - ( adjEnemyDef / (DEF_CONST + adjEnemyDef) )) * (1 - reduceRate);
+
+  // attack total. Note: we keep previous structure: atkPanel + atkBase*(formAtk+petAtkPercent) + petAtkFlat
+  const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
+
+  // crit total: original code used (1+(critDmg + petCritDmg -1)) weird expression;
+  // interpret critDmg input as percent e.g. 150 means 150% -> converted to fraction 1.5 (we used /100 earlier)
+  // We'll compute critMultiplier = 1 + critExtra where critExtra = (critDmg + petCritDmg + buffCritDMG)
+  // But to match earlier behavior preserve: critTotal = critDmg + petCritDmg + buffCritDMG (these are fractions)
+  const critTotalFraction = critDmg + petCritDmg + buffCritDMG; // e.g., 1.5+0.3 -> 1.8
+  const critMultiplier = 1 + (critTotalFraction - 1); // equals critTotalFraction
+
+  // damages
+  const baseDamage = atkTotal * skillRate;
+  const dmgCritOnly = baseDamage * critMultiplier * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+  const dmgWeakOnly = baseDamage * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+  const dmgBoth = baseDamage * critMultiplier * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+
+  return { dmgCritOnly, dmgWeakOnly, dmgBoth };
+}
+
+function recalcAll() {
+  const leftVals = readSide('left');
+  const rightVals = readSide('right');
+
+  // ensure right missing inputs are synced if marked as synced
+  FIELDS.forEach(f => {
+    const l = $id(`${f.id}-left`), r = $id(`${f.id}-right`), d = $id(`${f.id}-diff`);
+    if ((r.dataset.synced === 'true' || r.dataset.synced === undefined) && (d.value === '' || d.value === undefined)) {
+      r.value = l.value;
+      r.dataset.synced = 'true';
+      r.classList.add('gray');
+    }
   });
 
-  const label = document.createElement("label");
-  label.textContent = field.name;
-  label.className = "whitespace-nowrap";
+  // compute
+  const L = computeDamage(leftVals);
+  const R = computeDamage(rightVals);
 
-  const leftRow = document.createElement("div");
-  leftRow.className = "flex justify-between items-center gap-2";
-  leftRow.append(label, leftInput);
-  leftDiv.appendChild(leftRow);
+  // show per-card results
+  $id('result-left').innerHTML = `只暴擊：<b>${Math.round(L.dmgCritOnly).toLocaleString()}</b>，只弱點：<b>${Math.round(L.dmgWeakOnly).toLocaleString()}</b>，暴擊+弱點：<b style="color:#0369a1">${Math.round(L.dmgBoth).toLocaleString()}</b>`;
+  $id('result-right').innerHTML = `只暴擊：<b>${Math.round(R.dmgCritOnly).toLocaleString()}</b>，只弱點：<b>${Math.round(R.dmgWeakOnly).toLocaleString()}</b>，暴擊+弱點：<b style="color:#0369a1">${Math.round(R.dmgBoth).toLocaleString()}</b>`;
 
-  const rightRow = document.createElement("div");
-  rightRow.className = "flex justify-between items-center gap-2";
-  rightRow.append(label.cloneNode(true), rightInput);
-  rightDiv.appendChild(rightRow);
+  // bottom compare
+  $id('leftSummary').textContent = `A：暴擊 ${Math.round(L.dmgCritOnly).toLocaleString()} ｜ 弱點 ${Math.round(L.dmgWeakOnly).toLocaleString()} ｜ 最終 ${Math.round(L.dmgBoth).toLocaleString()}`;
+  $id('rightSummary').textContent = `B：暴擊 ${Math.round(R.dmgCritOnly).toLocaleString()} ｜ 弱點 ${Math.round(R.dmgWeakOnly).toLocaleString()} ｜ 最終 ${Math.round(R.dmgBoth).toLocaleString()}`;
 
-  const diffWrapper = document.createElement("div");
-  diffWrapper.appendChild(diffInput);
-  diffDiv.appendChild(diffWrapper);
+  let diffPct = 0;
+  if (L.dmgBoth > 0) diffPct = ((R.dmgBoth - L.dmgBoth) / L.dmgBoth) * 100;
+  $id('diffSummary').textContent = `B vs A 差異： ${diffPct >= 0 ? '+' : ''}${diffPct.toFixed(2)}%`;
 }
 
-fields.forEach((f, i) => createRow(f, i));
+// attach listeners for selects to recalc immediately (already done for left/right inputs)
+$id('set-left').addEventListener('change', () => { recalcAll(); });
+$id('set-right').addEventListener('change', () => { recalcAll(); });
 
-function calcDamage(values) {
-  const atk = parseFloat(values["面板攻擊力"]) || 0;
-  const base = parseFloat(values["基礎攻擊力"]) || 0;
-  const skill = (parseFloat(values["招式倍率"]) || 0) / 100;
-  const critDmg = 1 + (parseFloat(values["暴擊傷害"]) || 0) / 100;
-  const buff = 1 + (parseFloat(values["傷害量增加"]) || 0) / 100;
-  const pet = parseFloat(values["寵物攻擊力"]) || 0;
+// when any input changes, recalc (we already added listeners for left/right/diff; but also attach to any others created)
+FIELDS.forEach(f => {
+  const l = $id(`${f.id}-left`), r = $id(`${f.id}-right`), d = $id(`${f.id}-diff`);
+  // for safety add input listeners to recalc (some were added previously)
+  if (l) l.addEventListener('input', recalcAll);
+  if (r) r.addEventListener('input', recalcAll);
+  if (d) d.addEventListener('input', recalcAll);
+});
 
-  const normal = (atk + base + pet) * skill * buff;
-  const onlyCrit = normal * critDmg;
-  const onlyWeak = normal * 1.35;
-  const both = normal * critDmg * 1.35;
+// initial recalc
+recalcAll();
 
-  return { onlyCrit, onlyWeak, both };
-}
-
-function updateResult() {
-  const leftValues = {};
-  const rightValues = {};
-
-  fields.forEach((f, i) => {
-    leftValues[f.name] = document.getElementById(`left-${i}`).value;
-    rightValues[f.name] = document.getElementById(`right-${i}`).value;
-  });
-
-  const left = calcDamage(leftValues);
-  const right = calcDamage(rightValues);
-
-  document.getElementById("leftResult").innerHTML = `
-    左欄：暴擊 ${left.onlyCrit.toFixed(0)} ｜ 弱點 ${left.onlyWeak.toFixed(0)} ｜ 同時 ${left.both.toFixed(0)}
-  `;
-  document.getElementById("rightResult").innerHTML = `
-    右欄：暴擊 ${right.onlyCrit.toFixed(0)} ｜ 弱點 ${right.onlyWeak.toFixed(0)} ｜ 同時 ${right.both.toFixed(0)}
-  `;
-
-  const diff = ((right.both - left.both) / left.both) * 100;
-  document.getElementById("compareResult").innerHTML =
-    `差異：${diff >= 0 ? "+" : ""}${diff.toFixed(2)}%`;
-}
 </script>
 </body>
 </html>
