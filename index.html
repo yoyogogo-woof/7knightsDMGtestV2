@@ -3,10 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>774 雙裝備對照計算機（緊湊版）</title>
+  <title>774 雙裝備對照計算機</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* 🔒 B 欄自動同步時顯示鎖頭 */
+ 
+    @media (min-width: 168px) {
+  .three-col-grid {
+    grid-template-columns: 0.5fr 0.6fr 0.6fr; /* 電腦上更窄的比例 */
+    gap: 4px;
+    .main-container {
+        max-width: 300px; /* 🔧 原為 max-w-5xl (≈1280px)，縮為 900px */
+  }
+}
+    /* B 欄自動同步時顯示鎖頭 */
     .lock-icon::after {
       content: "🔒";
       position: absolute;
@@ -16,34 +25,23 @@
       opacity: 0.75;
       pointer-events: none;
     }
-
-    /* 三欄結構（手機） */
+    /* 手機也維持三欄 */
     .three-col-grid {
       display: grid;
-      grid-template-columns: 0.7fr 0.8fr 0.8fr;
-      gap: 6px;
+      grid-template-columns: 1fr 0.8fr 0.8fr;
+      gap: 4px;
       align-items: center;
     }
-    .row { display: contents; }
-
-    /* 桌機緊湊設定 */
-    @media (min-width: 768px) {
-      .three-col-grid {
-        grid-template-columns: 0.5fr 0.6fr 0.6fr;
-        gap: 4px;
-      }
-      .main-container {
-        max-width: 900px; /* 🔧 原為 max-w-5xl (≈1280px)，縮為 900px */
-      }
+    .row {
+      display: contents; /* 讓每個子元素自然落在三個欄 */
     }
   </style>
 </head>
-
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center py-8">
 
   <h1 class="text-3xl font-bold mb-6">774 雙裝備對照計算機</h1>
 
-  <div class="main-container bg-white shadow-lg rounded-2xl p-4 w-full max-w-5xl space-y-4 text-[15px] leading-tight">
+  <div class="bg-white shadow-lg rounded-2xl p-4 w-full max-w-5xl space-y-4 text-[15px] leading-tight">
 
     <!-- 表頭 -->
     <div class="three-col-grid font-semibold text-gray-700">
@@ -53,62 +51,462 @@
     </div>
     <hr class="border-gray-300">
 
-    <!-- 🧩 主輸入欄位 -->
+    <!-- 主輸出區（標題省略，依你的要求） -->
     <div class="three-col-grid">
+
+      <!-- 面板攻擊力 -->
       <div class="row">
         <label class="text-sm">面板攻擊力</label>
-        <div class="relative"><input id="A_atkPanel" type="number" class="border rounded p-1.5 w-full text-right"></div>
-        <div class="relative"><input id="B_atkPanel" type="number" class="border rounded p-1.5 w-full text-right"></div>
+        <div class="relative">
+          <input id="A_atkPanel" type="number" class="border rounded p-1.5 w-full text-right" placeholder="">
+        </div>
+        <div class="relative">
+          <input id="B_atkPanel" type="number" class="border rounded p-1.5 w-full text-right" placeholder="">
+        </div>
       </div>
 
+      <!-- 基礎攻擊力 -->
       <div class="row">
         <label class="text-sm">基礎攻擊力</label>
-        <div class="relative"><input id="A_atkBase" type="number" class="border rounded p-1.5 w-full text-right"></div>
-        <div class="relative"><input id="B_atkBase" type="number" class="border rounded p-1.5 w-full text-right"></div>
+        <div class="relative">
+          <input id="A_atkBase" type="number" class="border rounded p-1.5 w-full text-right" placeholder="">
+        </div>
+        <div class="relative">
+          <input id="B_atkBase" type="number" class="border rounded p-1.5 w-full text-right" placeholder="">
+        </div>
       </div>
 
+      <!-- 招式倍率 -->
       <div class="row">
         <label class="text-sm">招式倍率</label>
-        <div class="relative"><input id="A_skillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
-        <div class="relative"><input id="B_skillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+        <div class="relative">
+          <input id="A_skillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span>
+        </div>
+        <div class="relative">
+          <input id="B_skillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span>
+        </div>
       </div>
 
+      <!-- 暴擊傷害 -->
       <div class="row">
         <label class="text-sm">暴擊傷害</label>
-        <div class="relative"><input id="A_critDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
-        <div class="relative"><input id="B_critDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+        <div class="relative">
+          <input id="A_critDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span>
+        </div>
+        <div class="relative">
+          <input id="B_critDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span>
+        </div>
       </div>
 
+      <!-- 陣型提升攻擊力 -->
       <div class="row">
         <label class="text-sm">陣型提升攻擊力</label>
-        <div class="relative"><input id="A_formAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
-        <div class="relative"><input id="B_formAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+        <div class="relative">
+          <input id="A_formAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span>
+        </div>
+        <div class="relative">
+          <input id="B_formAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span>
+        </div>
       </div>
     </div>
 
-    <!-- 分隔線 -->
+    <!-- 分隔線（下拉選單上方） -->
     <hr class="border-gray-300">
 
-    <!-- 套裝效果 -->
+    <!-- 套裝效果（左右選單同列） -->
     <div class="three-col-grid">
       <div class="row">
         <label class="text-sm">套裝效果</label>
-        <div><select id="A_setEffect" class="border rounded p-2 w-full">
-          <option value="none">無</option><option value="tracker4">追蹤者4</option><option value="assassin4">刺客4</option><option value="avenger2">復仇2</option><option value="avenger4">復仇4</option><option value="avenger4Boss">復仇4(BOSS)</option>
-        </select></div>
-        <div><select id="B_setEffect" class="border rounded p-2 w-full">
-          <option value="none">無</option><option value="tracker4">追蹤者4</option><option value="assassin4">刺客4</option><option value="avenger2">復仇2</option><option value="avenger4">復仇4</option><option value="avenger4Boss">復仇4(BOSS)</option>
-        </select></div>
+        <div>
+          <select id="A_setEffect" class="border rounded p-2 w-full">
+            <option value="none">無套裝效果</option>
+            <option value="tracker4">追蹤者四件套（弱點傷害 +35%）</option>
+            <option value="assassin4">刺客四件套（無視防禦 +15%）</option>
+            <option value="avenger2">復仇者兩件套（傷害量 +15%）</option>
+            <option value="avenger4">復仇者四件套（傷害量 +30%）</option>
+            <option value="avenger4Boss">復仇者四件套（BOSS 傷害量 +70%）</option>
+          </select>
+        </div>
+        <div>
+          <select id="B_setEffect" class="border rounded p-2 w-full">
+            <option value="none">無套裝效果</option>
+            <option value="tracker4">追蹤者四件套（弱點傷害 +35%）</option>
+            <option value="assassin4">刺客四件套（無視防禦 +15%）</option>
+            <option value="avenger2">復仇者兩件套（傷害量 +15%）</option>
+            <option value="avenger4">復仇者四件套（傷害量 +30%）</option>
+            <option value="avenger4Boss">復仇者四件套（BOSS 傷害量 +70%）</option>
+          </select>
+        </div>
       </div>
     </div>
 
-    <!-- 以下省略：BUFF、寵物、敵方、防禦、結果表、重設按鈕 -->
-    <!-- 直接保留你現有版本的整段內容不變 -->
+    <!-- BUFF 區塊 -->
+    <hr class="border-gray-300">
+    <p class="text-lg font-semibold">【BUFF（選填）】</p>
+    <div class="three-col-grid">
+      <div class="row">
+        <label class="text-sm">攻擊力增加</label>
+        <div class="relative"><input id="A_buffAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_buffAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+      </div>
 
+      <div class="row">
+        <label class="text-sm">弱點傷害量增加</label>
+        <div class="relative"><input id="A_weakDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_weakDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+      </div>
+
+      <div class="row">
+        <label class="text-sm">傷害量增加</label>
+        <div class="relative"><input id="A_revengeDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_revengeDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+      </div>
+
+      <div class="row">
+        <label class="text-sm">暴擊傷害增加</label>
+        <div class="relative"><input id="A_buffCritDMG" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_buffCritDMG" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+      </div>
+
+      <div class="row">
+        <label class="text-sm">減少防禦力</label>
+        <div class="relative"><input id="A_deffDown" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_deffDown" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+      </div>
+
+      <div class="row">
+        <label class="text-sm">無視防禦</label>
+        <div class="relative"><input id="A_deffIgnore" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_deffIgnore" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+      </div>
+    </div>
+    <!-- BUFF 下方分隔線 -->
+    <hr class="border-gray-300">
+
+    <!-- 寵物效果 -->
+    <p class="text-lg font-semibold">【寵物效果】</p>
+    <div class="three-col-grid">
+      <div class="row">
+        <label class="text-sm">寵物攻擊力</label>
+        <div><input id="A_petAtkFlat" type="number" class="border rounded p-1.5 w-full text-right"></div>
+        <div><input id="B_petAtkFlat" type="number" class="border rounded p-1.5 w-full text-right"></div>
+      </div>
+
+      <div class="row">
+        <label class="text-sm">潛能：增加攻擊力</label>
+        <div class="relative"><input id="A_petAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_petAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+      </div>
+
+      <div class="row">
+        <label class="text-sm">技能：增加攻擊力</label>
+        <div class="relative"><input id="A_petSkillAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_petSkillAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+      </div>
+
+      <div class="row">
+        <label class="text-sm">技能：增加暴擊傷害</label>
+        <div class="relative"><input id="A_petCritDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_petCritDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+      </div>
+
+      <div class="row">
+        <label class="text-sm">技能：增加傷害</label>
+        <div class="relative"><input id="A_petDmgIncrese" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_petDmgIncrese" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-1.5 top-1.5 text-gray-400">%</span></div>
+      </div>
+    </div>
+    <!-- 寵物效果 下方分隔線 -->
+    <hr class="border-gray-300">
+
+    <!-- 敵方防禦 -->
+    <p class="text-lg font-semibold">【敵方防禦】</p>
+    <div class="three-col-grid">
+      <div class="row">
+        <label class="text-sm">敵方防禦力</label>
+        <div><input id="A_enemyDef" type="number" class="border rounded p-1.5 w-full text-right"></div>
+        <div><input id="B_enemyDef" type="number" class="border rounded p-1.5 w-full text-right"></div>
+      </div>
+
+      <div class="row">
+        <label class="text-sm">物理/魔法減傷</label>
+        <div class="relative"><input id="A_reduceRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_reduceRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+      </div>
+
+      <div class="row">
+        <label class="text-sm">增加防禦力</label>
+        <div class="relative"><input id="A_enemyDefIncrease" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_enemyDefIncrease" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+      </div>
+    </div>
+    <!-- 敵方防禦 下方分隔線 -->
+    <hr class="border-gray-300">
+
+    <!-- 結果表 -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm border border-gray-200">
+        <thead>
+          <tr class="bg-gray-50">
+            <th class="p-2 border-b border-gray-200 text-left">類型</th>
+            <th class="p-2 border-b border-gray-200 text-right">裝備 A</th>
+            <th class="p-2 border-b border-gray-200 text-right">裝備 B</th>
+          </tr>
+        </thead>
+        <tbody id="resultTable">
+          <tr>
+            <td class="p-2 border-b">無暴擊弱點</td>
+            <td class="p-2 border-b text-right" id="A_nono">-</td>
+            <td class="p-2 border-b text-right" id="B_nono">-</td>
+          </tr>
+          <tr>
+            <td class="p-2 border-b">只觸發暴擊</td>
+            <td class="p-2 border-b text-right" id="A_dmgCritOnly">-</td>
+            <td class="p-2 border-b text-right" id="B_dmgCritOnly">-</td>
+          </tr>
+          <tr>
+            <td class="p-2 border-b">只觸發弱點</td>
+            <td class="p-2 border-b text-right" id="A_dmgWeakOnly">-</td>
+            <td class="p-2 border-b text-right" id="B_dmgWeakOnly">-</td>
+          </tr>
+          <tr>
+            <td class="p-2 border-b">暴擊＋弱點</td>
+            <td class="p-2 border-b text-right text-blue-600 font-semibold" id="A_dmgBoth">-</td>
+            <td class="p-2 border-b text-right text-blue-600 font-semibold" id="B_dmgBoth">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 差異與操作 -->
+    <div class="flex items-center justify-between">
+      <div id="compareResult" class="text-base font-bold text-blue-600">請輸入完整數值</div>
+      <button id="resetBtn" class="bg-red-500 text-white px-5 py-2 rounded-xl hover:bg-red-600 transition">重設所有數值</button>
+    </div>
   </div>
 
   <script>
-    // ✅ 這裡直接貼上你目前的 JS（無需修改）
+    // 欄位清單
+    const fieldList = [
+      'atkPanel','atkBase','skillRate','critDmg','formAtk',
+      'setEffect','buffAtk','weakDmg','revengeDmg','buffCritDMG',
+      'deffDown','deffIgnore','petAtkFlat','petAtkPercent','petSkillAtk',
+      'petCritDmg','petDmgIncrese','enemyDef','reduceRate','enemyDefIncrease'
+    ];
+
+    // 工具函式
+    const $ = (id) => document.getElementById(id);
+    const get = (p, f) => $(`${p}_${f}`);
+    const saveLS = (p, f, val) => localStorage.setItem(`${p}_${f}`, val ?? '');
+    const loadLS = (p, f) => localStorage.getItem(`${p}_${f}`);
+
+    // 載入儲存值
+    function loadAll() {
+      ['A','B'].forEach(p=>{
+        fieldList.forEach(f=>{
+          const node = get(p,f);
+          if (!node) return;
+          const v = loadLS(p,f);
+          if (v !== null) node.value = v;
+        });
+      });
+
+      // 初始化 B 欄 userEdited 狀態
+      fieldList.forEach(f=>{
+        const b = get('B',f);
+        if (!b) return;
+        const v = b.value;
+        if (v && v !== '') {
+          b.dataset.userEdited = 'true';
+          b.classList.remove('bg-gray-200','lock-icon');
+        } else {
+          b.dataset.userEdited = 'false';
+        }
+      });
+    }
+
+    // 計算函式（依原邏輯）
+    function calc(prefix) {
+      const v = (f) => parseFloat(get(prefix,f)?.value) || 0;
+
+      const atkPanel = v('atkPanel');
+      const atkBase = v('atkBase');
+      const formAtk = v('formAtk')/100;
+      const skillRate = v('skillRate')/100;
+      const critDmg = v('critDmg')/100;
+
+      const buffAtk = v('buffAtk')/100;
+      const weakDmg = (v('weakDmg')+30)/100;
+      const revengeDmg = v('revengeDmg')/100;
+      const buffCritDMG = v('buffCritDMG')/100;
+      const deffDown = v('deffDown')/100;
+      const deffIgnore = v('deffIgnore')/100;
+
+      const petAtkFlat = v('petAtkFlat');
+      const petSkillAtk = v('petSkillAtk')/100;
+      const petCritDmg = v('petCritDmg')/100;
+      const petAtkPercent = v('petAtkPercent')/100;
+      const petDmgIncrese = v('petDmgIncrese')/100;
+
+      const enemyDef = v('enemyDef');
+      const reduceRate = v('reduceRate')/100;
+      const enemyDefIncrease = v('enemyDefIncrease')/100;
+
+      const setEffect = get(prefix,'setEffect')?.value || 'none';
+
+      let weakDmgTotal = weakDmg;
+      let revengeDmgTotal = revengeDmg;
+      let deffIgnoreTotal = deffIgnore;
+
+      switch (setEffect) {
+        case 'tracker4': weakDmgTotal += 0.35; break;
+        case 'avenger2': revengeDmgTotal += 0.15; break;
+        case 'avenger4': revengeDmgTotal += 0.30; break;
+        case 'avenger4Boss': revengeDmgTotal += 0.70; break;
+        case 'assassin4': deffIgnoreTotal += 0.15; break;
+      }
+
+      const DEF_CONST = 467;
+      const defRate = (1 - ((enemyDef*(1-deffDown+enemyDefIncrease)*(1-deffIgnoreTotal)) / (DEF_CONST + (enemyDef*(1-deffDown+enemyDefIncrease)*(1-deffIgnoreTotal))))) * (1 - reduceRate);
+
+      const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
+
+      const dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese);
+
+      return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth };
+    }
+
+    // 顯示結果到表格
+    function showResults(prefix, data) {
+      const fmt = (x) => !x || x<=0 ? '-' : Math.round(x).toLocaleString();
+      $(`${prefix}_nono`).textContent = fmt(data.nono);
+      $(`${prefix}_dmgCritOnly`).textContent = fmt(data.dmgCritOnly);
+      $(`${prefix}_dmgWeakOnly`).textContent = fmt(data.dmgWeakOnly);
+      $(`${prefix}_dmgBoth`).textContent = fmt(data.dmgBoth);
+    }
+
+    // 差異顯示
+    function showDiff(a, b) {
+      const box = $('compareResult');
+      if (!a || !b || a<=0 || b<=0) { box.textContent = '請輸入完整數值'; return; }
+      const diff = (b - a) / a * 100;
+      const sign = diff >= 0 ? '多' : '少';
+      const color = diff >= 0 ? 'text-green-600' : 'text-red-600';
+      box.innerHTML = `B 比 A <span class="${color} font-bold">${sign}${Math.abs(diff).toFixed(2)}%</span>`;
+    }
+
+    // 同步（A -> B）僅空白或未被手動編輯過的欄位
+    function syncField(field) {
+      const a = get('A', field);
+      const b = get('B', field);
+      if (!a || !b) return;
+
+      if (b.dataset.userEdited === 'true' && b.value !== '') return;
+
+      b.value = a.value;
+      b.dataset.autoSynced = 'true';
+      b.classList.add('bg-gray-200','lock-icon');
+      b.dataset.userEdited = 'false';
+      saveLS('B', field, b.value);
+    }
+
+    function syncAll() {
+      fieldList.forEach(syncField);
+    }
+
+    // 更新整體畫面
+    function updateAll() {
+      // 先同步（確保 B 的 auto 值與 A 一致）
+      syncAll();
+
+      const A = calc('A');
+      const B = calc('B');
+      showResults('A', A);
+      showResults('B', B);
+      showDiff(A.dmgBoth, B.dmgBoth);
+    }
+
+    // 輸入事件處理
+    function onInput(e) {
+      const node = e.target;
+      const id = node.id; // 例如 A_atkPanel
+      const [prefix, field] = id.split('_');
+
+      // 儲存
+      saveLS(prefix, field, node.value);
+
+      if (prefix === 'A') {
+        // A 變動 → 嘗試同步到 B（若 B 未手動輸入）
+        syncField(field);
+      } else if (prefix === 'B') {
+        if (node.value !== '') {
+          node.dataset.userEdited = 'true';
+          node.classList.remove('bg-gray-200','lock-icon');
+          delete node.dataset.autoSynced;
+        } else {
+          node.dataset.userEdited = 'false';
+          // 清空後回到自動狀態
+          syncField(field);
+        }
+      }
+
+      updateAll();
+    }
+
+    // 綁定所有 input/select
+    function bindAll() {
+      fieldList.forEach(f=>{
+        const a = get('A',f), b = get('B',f);
+        if (a) a.addEventListener('input', onInput);
+        if (b) b.addEventListener('input', onInput);
+      });
+    }
+
+    // 重設
+    function resetAll() {
+      if (!confirm('確定要清除所有數值嗎？')) return;
+      fieldList.forEach(f=>{
+        localStorage.removeItem(`A_${f}`);
+        localStorage.removeItem(`B_${f}`);
+        const a = get('A',f), b = get('B',f);
+        if (a) a.value = '';
+        if (b) {
+          b.value = '';
+          b.dataset.userEdited = 'false';
+          b.classList.remove('bg-gray-200','lock-icon');
+        }
+      });
+      // 清空結果
+      ['A','B'].forEach(p=>{
+        $(`${p}_nono`).textContent='-';
+        $(`${p}_dmgCritOnly`).textContent='-';
+        $(`${p}_dmgWeakOnly`).textContent='-';
+        $(`${p}_dmgBoth`).textContent='-';
+      });
+      $('compareResult').textContent='請輸入完整數值';
+    }
+
+    // 初始化
+    loadAll();
+    bindAll();
+    // 頁面初次載入：讓 B 的空欄位跟 A 同步並顯示鎖頭
+    syncAll();
+    updateAll();
+
+    $('resetBtn').addEventListener('click', resetAll);
+
+    // 離開前再保險存一次
+    window.addEventListener('beforeunload', ()=>{
+      fieldList.forEach(f=>{
+        const a = get('A',f), b = get('B',f);
+        if (a) saveLS('A',f,a.value);
+        if (b) saveLS('B',f,b.value);
+      });
+    });
   </script>
 </body>
 </html>
+
