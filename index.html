@@ -11,56 +11,51 @@
   <!-- 頁面標題 -->
   <h1 class="text-3xl font-bold mb-6">774傷害計算機</h1>
 
-  <!-- 整個主容器 -->
-  <div class="bg-white shadow-lg rounded-2xl p-6 w-full max-w-2xl space-y-6">
+ <div class="bg-white shadow-lg rounded-2xl p-6 w-full max-w-2xl space-y-8">
 
-    <!-- 攻擊力區塊 -->
-<section>
-  <h2 class="text-xl font-semibold border-b pb-2 mb-4">🗡️ 主輸出</h2>
+  <!-- 🗡️ 主輸出 -->
+  <section>
+    <h2 class="text-xl font-semibold border-b pb-2 mb-4">🗡️ 主輸出</h2>
+    <div class="space-y-2">
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">面板攻擊力</label>
+        <input type="number" id="atkPanel" class="border rounded p-2 w-48" placeholder="輸入數值">
+      </div>
 
-  <div class="space-y-2">
-    <!-- 面板攻擊力 -->
-    <div class="grid grid-cols-[auto,1fr,auto] items-center gap-2">
-      <label for="atkPanel" class="text-right whitespace-nowrap">面板攻擊力</label>
-      <input type="number" id="atkPanel" class="border rounded p-2 w-full" placeholder="輸入數值">
-      <span></span>
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">基礎攻擊力</label>
+        <input type="number" id="atkBase" class="border rounded p-2 w-48" placeholder="圖鑑看，大部分都是1500">
+      </div>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">招式倍率</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="skillRate" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">暴擊傷害</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="critDmg" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">陣型提升攻擊力</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="formAtk" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
     </div>
 
-    <!-- 基礎攻擊力 -->
-    <div class="grid grid-cols-[auto,1fr,auto] items-center gap-2">
-      <label for="atkBase" class="text-right whitespace-nowrap">基礎攻擊力</label>
-      <input type="number" id="atkBase" class="border rounded p-2 w-full" placeholder="圖鑑看，大部分都是1500">
-      <span></span>
-    </div>
-
-    <!-- 招式倍率 -->
-    <div class="grid grid-cols-[auto,1fr,auto] items-center gap-2">
-      <label for="skillRate" class="text-right whitespace-nowrap">招式倍率</label>
-      <input type="number" id="skillRate" class="border rounded p-2 w-full" placeholder="輸入數值">
-      <span>%</span>
-    </div>
-
-    <!-- 暴擊傷害 -->
-    <div class="grid grid-cols-[auto,1fr,auto] items-center gap-2">
-      <label for="critDmg" class="text-right whitespace-nowrap">暴擊傷害</label>
-      <input type="number" id="critDmg" class="border rounded p-2 w-full" placeholder="輸入數值">
-      <span>%</span>
-    </div>
-
-    <!-- 陣型提升攻擊力 -->
-    <div class="grid grid-cols-[auto,1fr,auto] items-center gap-2">
-      <label for="formAtk" class="text-right whitespace-nowrap">陣型提升攻擊力</label>
-      <input type="number" id="formAtk" class="border rounded p-2 w-full" placeholder="輸入數值">
-      <span>%</span>
-    </div>
-  </div>
-
-  <!-- 套裝效果 -->
-  <div class="mt-6 border-t pt-4">
-    <h3 class="text-lg font-semibold mb-2">💎 套裝效果</h3>
-    <div class="grid grid-cols-[auto,1fr] items-center gap-2">
-      <label for="setEffect" class="text-right whitespace-nowrap">選擇套裝</label>
-      <select id="setEffect" class="border rounded p-2 w-full">
+    <!-- 套裝效果 -->
+    <div class="mt-6 border-t pt-4">
+      <h3 class="text-lg font-semibold mb-2">💎 套裝效果</h3>
+      <select id="setEffect" class="border rounded p-2 w-48">
         <option value="none">無套裝效果</option>
         <option value="tracker4">追蹤者四件套（弱點傷害 +35%）</option>
         <option value="assassin4">刺客四件套（無視防禦 +15%）</option>
@@ -69,131 +64,138 @@
         <option value="avenger4Boss">復仇者四件套（攻擊 BOSS 時 傷害量 +40%）</option>
       </select>
     </div>
-  </div>
-</section>
+  </section>
 
-
-<!-- BUFF -->
-    <section>
-      <h2 class="text-xl font-semibold border-b pb-2 mb-4">✨ BUFF(選填)</h2>
-      <div class="grid grid-cols-2 gap-4">
-          <label class="flex flex-col">
-          <span>攻擊力增加</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="buffAtk" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
-          <label class="flex flex-col">
-          <span>弱點傷害量增加</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="weakDmg" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
-        <label class="flex flex-col">
-          <span>傷害量增加</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="revengeDmg" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
-        <label class="flex flex-col">
-          <span>暴擊傷害增加</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="buffCritDMG" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
-        <label class="flex flex-col">
-          <span>減少防禦力</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="deffDown" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
-        <label class="flex flex-col">
-          <span>無視防禦</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="deffIgnore" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
+  <!-- ✨ BUFF -->
+  <section>
+    <h2 class="text-xl font-semibold border-b pb-2 mb-4">✨ BUFF（選填）</h2>
+    <div class="space-y-2">
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">攻擊力增加</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="buffAtk" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
       </div>
-    </section>
-    
-    <!-- 寵物資料 -->
-    <section>
-      <h2 class="text-xl font-semibold border-b pb-2 mb-4">🐕 寵物</h2>
-      <div class="grid grid-cols-2 gap-4">
-        <label class="flex flex-col">
-          <span>寵物攻擊力</span>
-          <input type="number" id="petAtkFlat" class="border rounded p-2" placeholder="輸入數值">
-        </label>
-        <label class="flex flex-col">
-          <span>潛能：增加攻擊力</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="petAtkPercent" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
-        <label class="flex flex-col">
-          <span>技能：增加攻擊力</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="petSkillAtk" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
-        <label class="flex flex-col">
-          <span>技能：增加暴擊傷害</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="petCritDmg" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
-        <label class="flex flex-col">
-          <span>技能：增加傷害</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="petDmgIncrese" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">弱點傷害量增加</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="weakDmg" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
       </div>
-    </section>
-    
-    <!-- 敵人資料 -->
-    <section>
-      <h2 class="text-xl font-semibold border-b pb-2 mb-4">🛡️ 敵人</h2>
-      <div class="grid grid-cols-2 gap-4">
-        <label class="flex flex-col">
-          <span>敵方防禦力</span>
-          <input type="number" id="enemyDef" class="border rounded p-2" placeholder="輸入數值">
-        </label>
-        <label class="flex flex-col">
-          <span>物理/魔法減傷</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="reduceRate" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
-        <label class="flex flex-col">
-          <span>增加防禦力</span>
-          <div class="flex items-center border rounded overflow-hidden">
-            <input type="number" id="enemyDefIncrease" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
-            <span class="px-3 text-gray-400">%</span>
-          </div>
-        </label>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">傷害量增加</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="revengeDmg" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
       </div>
-    </section>
 
-    <!-- 結果與按鈕 -->
-    <section class="text-center space-y-4">
-      <p class="text-lg"><span id="result" class="font-bold text-blue-600">請輸入數值</span></p>
-      <button id="resetBtn" class="bg-red-500 text-white px-6 py-2 rounded-xl hover:bg-red-600 transition">重設所有數值</button>
-    </section>
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">暴擊傷害增加</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="buffCritDMG" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
 
-  </div>
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">減少防禦力</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="deffDown" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
 
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">無視防禦</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="deffIgnore" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🐕 寵物 -->
+  <section>
+    <h2 class="text-xl font-semibold border-b pb-2 mb-4">🐕 寵物</h2>
+    <div class="space-y-2">
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">寵物攻擊力</label>
+        <input type="number" id="petAtkFlat" class="border rounded p-2 w-48" placeholder="輸入數值">
+      </div>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">潛能：增加攻擊力</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="petAtkPercent" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">技能：增加攻擊力</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="petSkillAtk" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">技能：增加暴擊傷害</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="petCritDmg" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">技能：增加傷害</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="petDmgIncrese" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🛡️ 敵人 -->
+  <section>
+    <h2 class="text-xl font-semibold border-b pb-2 mb-4">🛡️ 敵人</h2>
+    <div class="space-y-2">
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">敵方防禦力</label>
+        <input type="number" id="enemyDef" class="border rounded p-2 w-48" placeholder="輸入數值">
+      </div>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">物理/魔法減傷</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="reduceRate" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-[auto,1fr] items-center gap-2">
+        <label class="text-right whitespace-nowrap">增加防禦力</label>
+        <div class="flex items-center border rounded overflow-hidden w-48">
+          <input type="number" id="enemyDefIncrease" class="p-2 w-full pr-1 outline-none" placeholder="輸入數值">
+          <span class="px-3 text-gray-400">%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 結果與按鈕 -->
+  <section class="text-center space-y-4 pt-4 border-t">
+    <p class="text-lg"><span id="result" class="font-bold text-blue-600">請輸入數值</span></p>
+    <button id="resetBtn" class="bg-red-500 text-white px-6 py-2 rounded-xl hover:bg-red-600 transition">重設所有數值</button>
+  </section>
+</div>
   <script>
     const fields = [
       'atkPanel', 'atkBase', 'formAtk', 'buffAtk', 'skillRate', 'critDmg',
@@ -334,6 +336,7 @@ fields.forEach(id => {
   </script>
 </body>
 </html>
+
 
 
 
