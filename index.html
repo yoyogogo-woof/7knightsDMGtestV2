@@ -5,128 +5,175 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>774傷害計算機（雙欄比較版）</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .input-cell {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      align-items: center;
+      gap: 8px;
+    }
+    .input-cell input[type="number"] {
+      text-align: right;
+      padding-right: 1.5rem;
+    }
+    .percent-symbol {
+      position: absolute;
+      right: 6px;
+      top: 5px;
+      color: #9ca3af;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center py-8">
   <h1 class="text-3xl font-bold mb-6">⚔️ 774傷害計算機（雙欄比較版）</h1>
 
-  <!-- 雙欄容器 -->
-  <div class="flex flex-wrap justify-center gap-6 w-full max-w-5xl">
-    <!-- 兩欄 -->
-    <div id="columns" class="flex flex-col md:flex-row gap-6 w-full justify-center"></div>
+  <div class="grid grid-cols-3 gap-4 w-full max-w-6xl">
+    <!-- 左欄 -->
+    <div id="col-left" class="bg-white shadow-lg rounded-2xl p-4 space-y-6 text-[15px]"></div>
+
+    <!-- 中間差值 -->
+    <div id="col-diff" class="flex flex-col justify-start items-center bg-transparent text-sm text-gray-600"></div>
+
+    <!-- 右欄 -->
+    <div id="col-right" class="bg-white shadow-lg rounded-2xl p-4 space-y-6 text-[15px]"></div>
   </div>
 
   <script>
-    /* ------------------ 共用欄位設定 ------------------ */
-    const fieldList = [
-      ['atkPanel', '面板攻擊力'],
-      ['atkBase', '基礎攻擊力'],
-      ['skillRate', '招式倍率', '%'],
-      ['critDmg', '暴擊傷害', '%'],
-      ['formAtk', '陣型提升攻擊力', '%'],
-      ['setEffect', '套裝效果', 'select'],
-      ['buffAtk', '攻擊力增加', '%'],
-      ['weakDmg', '弱點傷害量增加', '%'],
-      ['revengeDmg', '傷害量增加', '%'],
-      ['buffCritDMG', '暴擊傷害增加', '%'],
-      ['deffDown', '減少防禦力', '%'],
-      ['deffIgnore', '無視防禦', '%'],
-      ['petAtkFlat', '寵物攻擊力'],
-      ['petAtkPercent', '潛能：增加攻擊力', '%'],
-      ['petSkillAtk', '技能：增加攻擊力', '%'],
-      ['petCritDmg', '技能：增加暴擊傷害', '%'],
-      ['petDmgIncrese', '技能：增加傷害', '%'],
-      ['enemyDef', '敵方防禦力'],
-      ['reduceRate', '物理/魔法減傷', '%'],
-      ['enemyDefIncrease', '增加防禦力', '%']
-    ];
+    /* === 區塊設定 === */
+    const sections = {
+      main: { title: "🗡️ 主輸出", fields: [
+        ['atkPanel', '面板攻擊力'],
+        ['atkBase', '基礎攻擊力'],
+        ['skillRate', '招式倍率', '%'],
+        ['critDmg', '暴擊傷害', '%'],
+        ['formAtk', '陣型提升攻擊力', '%'],
+        ['setEffect', '套裝效果', 'select'],
+      ]},
+      buff: { title: "✨ BUFF（選填）", fields: [
+        ['buffAtk', '攻擊力增加', '%'],
+        ['weakDmg', '弱點傷害量增加', '%'],
+        ['revengeDmg', '傷害量增加', '%'],
+        ['buffCritDMG', '暴擊傷害增加', '%'],
+        ['deffDown', '減少防禦力', '%'],
+        ['deffIgnore', '無視防禦', '%'],
+      ]},
+      pet: { title: "🐾 寵物", fields: [
+        ['petAtkFlat', '寵物攻擊力'],
+        ['petAtkPercent', '潛能：增加攻擊力', '%'],
+        ['petSkillAtk', '技能：增加攻擊力', '%'],
+        ['petCritDmg', '技能：增加暴擊傷害', '%'],
+        ['petDmgIncrese', '技能：增加傷害', '%'],
+      ]},
+      enemy: { title: "🛡️ 敵人", fields: [
+        ['enemyDef', '敵方防禦力'],
+        ['reduceRate', '物理/魔法減傷', '%'],
+        ['enemyDefIncrease', '增加防禦力', '%'],
+      ]}
+    };
 
     const setOptions = `
       <option value="none">無套裝效果</option>
       <option value="tracker4">追蹤者四件套（弱點傷害 +35%）</option>
-      <option value="assassin4">刺客四件套（無視防禦 +15%）</option>
       <option value="avenger2">復仇者兩件套（傷害量 +15%）</option>
       <option value="avenger4">復仇者四件套（傷害量 +30%）</option>
       <option value="avenger4Boss">復仇者四件套（BOSS 傷害量 +70%）</option>
     `;
 
-    /* ------------------ 建立欄位 ------------------ */
-    const container = document.getElementById("columns");
-    ['left', 'right'].forEach(side => {
-      const col = document.createElement("div");
-      col.className = "bg-white shadow-lg rounded-2xl p-4 w-full max-w-[340px] space-y-6 text-[15px]";
-      col.innerHTML = `
-        <h2 class="text-lg font-semibold border-b pb-2 mb-4">${side === 'left' ? '裝備 A' : '裝備 B'}</h2>
-        <div class="space-y-2">
-          ${fieldList.map(([id, label, unit]) => `
-            <div class="flex justify-between items-center">
-              <label>${label}</label>
-              ${
-                unit === 'select'
-                  ? `<select id="${id}-${side}" class="border rounded p-1.5 w-40 text-sm">${setOptions}</select>`
-                  : `
-                    <div class="relative w-28">
-                      <input id="${id}-${side}" type="number" class="border rounded p-1.5 w-full text-right pr-6 bg-white" placeholder="">
-                      ${unit === '%' ? `<span class="absolute right-2 top-1.5 text-gray-400">%</span>` : ''}
-                    </div>
-                  `
-              }
-            </div>
-          `).join('')}
-        </div>
-        <section class="text-center space-y-2 border-t pt-3">
-          <p class="text-base font-semibold">📊 計算結果</p>
-          <div id="result-${side}" class="text-sm text-gray-700 leading-relaxed">請輸入數值</div>
-        </section>
-      `;
-      container.appendChild(col);
+    const colLeft = document.getElementById("col-left");
+    const colRight = document.getElementById("col-right");
+    const colDiff = document.getElementById("col-diff");
+
+    /* === 建立UI === */
+    Object.values(sections).forEach(sec => {
+      // 左右區塊
+      const leftBlock = document.createElement("div");
+      const rightBlock = document.createElement("div");
+      const diffBlock = document.createElement("div");
+      leftBlock.innerHTML = `<h2 class="text-lg font-semibold border-b pb-2 mb-3">${sec.title}</h2>`;
+      rightBlock.innerHTML = `<h2 class="text-lg font-semibold border-b pb-2 mb-3">${sec.title}</h2>`;
+      diffBlock.innerHTML = `<div class="h-8"></div>`;
+
+      sec.fields.forEach(([id, label, unit]) => {
+        leftBlock.innerHTML += `
+          <div class="flex justify-between items-center mb-1">
+            <label>${label}</label>
+            ${
+              unit === 'select'
+                ? `<select id="${id}-left" class="border rounded p-1.5 w-40 text-sm">${setOptions}</select>`
+                : `<div class="relative w-28">
+                    <input id="${id}-left" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
+                    ${unit === '%' ? `<span class="percent-symbol">%</span>` : ''}
+                   </div>`
+            }
+          </div>`;
+
+        diffBlock.innerHTML += `<div class="flex justify-center mb-2">
+          ${unit !== 'select' ? `<input id="${id}-diff" type="number" class="border rounded w-14 text-center text-sm" placeholder="+/-">` : `<div class="h-9"></div>`}
+        </div>`;
+
+        rightBlock.innerHTML += `
+          <div class="flex justify-between items-center mb-1">
+            <label>${label}</label>
+            ${
+              unit === 'select'
+                ? `<select id="${id}-right" class="border rounded p-1.5 w-40 text-sm bg-gray-100">${setOptions}</select>`
+                : `<div class="relative w-28">
+                    <input id="${id}-right" type="number" class="border rounded p-1.5 w-full text-right pr-6 bg-gray-100" placeholder="">
+                    ${unit === '%' ? `<span class="percent-symbol">%</span>` : ''}
+                   </div>`
+            }
+          </div>`;
+      });
+
+      colLeft.appendChild(leftBlock);
+      colDiff.appendChild(diffBlock);
+      colRight.appendChild(rightBlock);
     });
 
-    /* ------------------ 差值欄位 ------------------ */
-    const diffDiv = document.createElement("div");
-    diffDiv.className = "hidden md:flex flex-col justify-center items-center text-center";
-    diffDiv.innerHTML = fieldList.map(([id]) => `
-      <input type="number" id="${id}-diff" class="border rounded mb-[10px] w-16 text-center text-sm" placeholder="+/-">
-    `).join('');
-    container.insertBefore(diffDiv, container.children[1]);
+    /* === 計算區 === */
+    const calcZone = side => `
+      <section class="text-center space-y-2 border-t pt-3 mt-3">
+        <p class="text-base font-semibold">📊 計算結果</p>
+        <div id="result-${side}" class="text-sm text-gray-700 leading-relaxed">請輸入數值</div>
+      </section>`;
+    colLeft.innerHTML += calcZone("left");
+    colRight.innerHTML += calcZone("right");
 
-    /* ------------------ 核心邏輯 ------------------ */
-    function v(id, side) {
+    /* === 輸入值 & 計算 === */
+    function val(id, side) {
       return parseFloat(document.getElementById(`${id}-${side}`).value) || 0;
     }
 
     function calculate(side) {
-      const atkPanel = v('atkPanel', side);
-      const atkBase = v('atkBase', side);
-      const formAtk = v('formAtk', side) / 100;
-      const skillRate = v('skillRate', side) / 100;
-      const critDmg = v('critDmg', side) / 100;
-      const buffAtk = v('buffAtk', side) / 100;
-      const weakDmg = v('weakDmg', side) / 100;
-      const revengeDmg = v('revengeDmg', side) / 100;
-      const buffCritDMG = v('buffCritDMG', side) / 100;
-      const deffDown = v('deffDown', side) / 100;
-      const deffIgnore = v('deffIgnore', side) / 100;
-      const petAtkFlat = v('petAtkFlat', side);
-      const petSkillAtk = v('petSkillAtk', side) / 100;
-      const petCritDmg = v('petCritDmg', side) / 100;
-      const petAtkPercent = v('petAtkPercent', side) / 100;
-      const petDmgIncrese = v('petDmgIncrese', side) / 100;
-      const enemyDef = v('enemyDef', side);
-      const reduceRate = v('reduceRate', side) / 100;
-      const enemyDefIncrease = v('enemyDefIncrease', side) / 100;
+      const atkPanel = val('atkPanel', side);
+      const atkBase = val('atkBase', side);
+      const formAtk = val('formAtk', side) / 100;
+      const skillRate = val('skillRate', side) / 100;
+      const critDmg = val('critDmg', side) / 100;
+      const buffAtk = val('buffAtk', side) / 100;
+      const weakDmg = val('weakDmg', side) / 100;
+      const revengeDmg = val('revengeDmg', side) / 100;
+      const buffCritDMG = val('buffCritDMG', side) / 100;
+      const deffDown = val('deffDown', side) / 100;
+      const deffIgnore = val('deffIgnore', side) / 100;
+      const petAtkFlat = val('petAtkFlat', side);
+      const petSkillAtk = val('petSkillAtk', side) / 100;
+      const petCritDmg = val('petCritDmg', side) / 100;
+      const petAtkPercent = val('petAtkPercent', side) / 100;
+      const petDmgIncrese = val('petDmgIncrese', side) / 100;
+      const enemyDef = val('enemyDef', side);
+      const reduceRate = val('reduceRate', side) / 100;
+      const enemyDefIncrease = val('enemyDefIncrease', side) / 100;
       const setEffect = document.getElementById(`setEffect-${side}`).value;
 
-      let weakDmgTotal = weakDmg;
-      let revengeDmgTotal = revengeDmg;
-      let deffIgnoreTotal = deffIgnore;
-
+      let weakDmgTotal = weakDmg, revengeDmgTotal = revengeDmg, deffIgnoreTotal = deffIgnore;
       switch (setEffect) {
         case 'tracker4': weakDmgTotal += 0.35; break;
         case 'avenger2': revengeDmgTotal += 0.15; break;
         case 'avenger4': revengeDmgTotal += 0.30; break;
         case 'avenger4Boss': revengeDmgTotal += 0.70; break;
-        case 'assassin4': deffIgnoreTotal += 0.15; break;
       }
 
       const DEF_CONST = 467;
@@ -134,59 +181,67 @@
         (DEF_CONST + (enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal))))) * (1 - reduceRate);
 
       const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
-
       const dmgCrit = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       const dmgWeak = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
 
       document.getElementById(`result-${side}`).innerHTML = `
-        <div class="space-y-1">
-          <p><b>只暴擊：</b>${Math.round(dmgCrit).toLocaleString()}</p>
-          <p><b>只弱點：</b>${Math.round(dmgWeak).toLocaleString()}</p>
-          <p><b>暴擊＋弱點：</b><span class="text-blue-600 font-bold">${Math.round(dmgBoth).toLocaleString()}</span></p>
-        </div>
+        <p><b>只暴擊：</b>${Math.round(dmgCrit).toLocaleString()}</p>
+        <p><b>只弱點：</b>${Math.round(dmgWeak).toLocaleString()}</p>
+        <p><b>暴擊＋弱點：</b><span class="text-blue-600 font-bold">${Math.round(dmgBoth).toLocaleString()}</span></p>
       `;
       return dmgBoth;
     }
 
-    /* ------------------ 同步邏輯與差值 ------------------ */
-    fieldList.forEach(([id]) => {
-      const left = document.getElementById(`${id}-left`);
-      const right = document.getElementById(`${id}-right`);
-      const diff = document.getElementById(`${id}-diff`);
-
-      const updateRight = () => {
-        if (right.value === "") {
-          right.classList.add("bg-gray-100");
-          right.value = left.value;
-        }
-        calculateBoth();
-      };
-
-      const applyDiff = () => {
-        const base = parseFloat(left.value) || 0;
-        const delta = parseFloat(diff.value);
-        if (!isNaN(delta)) {
-          right.value = base + delta;
-          right.classList.remove("bg-gray-100");
-        } else {
-          right.value = "";
-        }
-        calculateBoth();
-      };
-
-      [left, right].forEach(el => el.addEventListener("input", calculateBoth));
-      diff.addEventListener("input", applyDiff);
-      left.addEventListener("input", updateRight);
-    });
-
     function calculateBoth() {
-      const dmgL = calculate('left');
-      const dmgR = calculate('right');
-      const resultRight = document.getElementById("result-right");
+      const dmgL = calculate("left");
+      const dmgR = calculate("right");
       const diff = dmgL > 0 ? (((dmgR - dmgL) / dmgL) * 100).toFixed(2) : 0;
-      resultRight.innerHTML += `<p class="text-green-600 font-semibold mt-2">提升：約 ${diff}%</p>`;
+      document.getElementById("result-right").innerHTML += `<p class="text-green-600 font-semibold mt-2">差異：約 ${diff}%</p>`;
     }
+
+    /* === 同步與差值邏輯 === */
+    Object.values(sections).forEach(sec => {
+      sec.fields.forEach(([id, , unit]) => {
+        if (unit === 'select') {
+          document.getElementById(`${id}-left`).addEventListener("change", e => {
+            const right = document.getElementById(`${id}-right`);
+            right.value = e.target.value;
+            calculateBoth();
+          });
+          return;
+        }
+
+        const left = document.getElementById(`${id}-left`);
+        const right = document.getElementById(`${id}-right`);
+        const diff = document.getElementById(`${id}-diff`);
+
+        const syncRight = () => {
+          if (right.value === "") {
+            right.value = left.value;
+            right.classList.add("bg-gray-100");
+          }
+          calculateBoth();
+        };
+
+        const applyDiff = () => {
+          const base = parseFloat(left.value) || 0;
+          const delta = parseFloat(diff.value);
+          if (!isNaN(delta)) {
+            right.value = base + delta;
+            right.classList.remove("bg-gray-100");
+          } else {
+            right.value = left.value;
+            right.classList.add("bg-gray-100");
+          }
+          calculateBoth();
+        };
+
+        [left, right].forEach(el => el.addEventListener("input", calculateBoth));
+        diff.addEventListener("input", applyDiff);
+        left.addEventListener("input", syncRight);
+      });
+    });
 
   </script>
 </body>
