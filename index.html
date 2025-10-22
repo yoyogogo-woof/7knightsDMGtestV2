@@ -12,39 +12,57 @@
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center py-8">
+
   <h1 class="text-3xl font-bold mb-6">774傷害計算機（雙裝備對比）</h1>
 
-  <!-- 主容器 -->
-  <div class="flex flex-col md:flex-row gap-6">
+  <!-- 兩邊放在同一橫列 -->
+  <div class="flex flex-col md:flex-row gap-8">
 
-    <!-- ===== 左邊：裝備A ===== -->
+    <!-- ========= 裝備A ========= -->
     <div id="calcA" class="bg-white shadow-lg rounded-2xl p-4 w-full max-w-[340px] space-y-6 text-[15px] leading-tight">
-      <h2 class="text-lg font-semibold border-b pb-2 mb-4 text-center">裝備A</h2>
-      <div id="inputsA"></div>
+      <h2 class="text-lg font-semibold border-b pb-2 mb-4">裝備A</h2>
+
+      <!-- 原本整個輸入內容保持不動 -->
+      <div id="formA">
+        <!-- ✅ 直接貼你原本的輸入部分 -->
+        <!--（此處省略重複輸入欄，跟你原版一模一樣）-->
+        <!-- 👇👇👇 從你原本的 <section> 面板攻擊力 ... 到結果顯示那部分全貼進來 👇👇👇 -->
+        <!-- 我只在下面完整示範結尾部分 -->
+      </div>
+
+      <!-- 結果A -->
       <section class="text-center space-y-2 border-t pt-3">
         <p class="text-base font-semibold">【計算結果】</p>
-        <div id="resultA" class="text-sm text-gray-700 leading-relaxed">請輸入數值</div>
+        <div id="resultA" class="text-sm text-gray-700 leading-relaxed">
+          請輸入數值
+        </div>
       </section>
     </div>
 
-    <!-- ===== 右邊：裝備B ===== -->
+    <!-- ========= 裝備B ========= -->
     <div id="calcB" class="bg-white shadow-lg rounded-2xl p-4 w-full max-w-[340px] space-y-6 text-[15px] leading-tight">
-      <h2 class="text-lg font-semibold border-b pb-2 mb-4 text-center">裝備B</h2>
-      <div id="inputsB"></div>
+      <h2 class="text-lg font-semibold border-b pb-2 mb-4">裝備B</h2>
+
+      <!-- 直接複製整個輸入結構（與A完全相同，只是 id 改成 B_ 開頭） -->
+      <div id="formB"></div>
+
+      <!-- 結果B -->
       <section class="text-center space-y-2 border-t pt-3">
         <p class="text-base font-semibold">【計算結果】</p>
-        <div id="resultB" class="text-sm text-gray-700 leading-relaxed">請輸入數值</div>
+        <div id="resultB" class="text-sm text-gray-700 leading-relaxed">
+          請輸入數值
+        </div>
       </section>
     </div>
-
   </div>
 
+  <!-- 重設 -->
   <button id="resetBtn" class="mt-6 bg-red-500 text-white px-5 py-2 rounded-xl hover:bg-red-600 transition">
     重設所有數值
   </button>
 
   <script>
-    // ===== 原有欄位ID =====
+    // 1️⃣ 原始欄位名稱
     const fields = [
       'atkPanel', 'atkBase', 'formAtk', 'buffAtk', 'skillRate', 'critDmg',
       'weakDmg', 'revengeDmg', 'petAtkFlat', 'petSkillAtk', 'petCritDmg', 
@@ -52,29 +70,22 @@
       'deffDown','deffIgnore','enemyDefIncrease','petDmgIncrese'
     ];
 
-    // ===== 動態產生輸入欄位區塊（直接複製你原本的HTML內容） =====
-    const baseHTML = document.querySelector('body').innerHTML;
-    const originalInputs = document.querySelector('div.bg-white').innerHTML;
+    // 2️⃣ 複製 A 的內容作為 B（只換 ID 前綴）
+    const formA = document.getElementById('formA');
+    const formB = document.getElementById('formB');
+    formB.innerHTML = formA.innerHTML.replaceAll('id="', 'id="B_').replaceAll('for="', 'for="B_');
 
-    // 抽取原本主輸入區 HTML
-    const sections = document.querySelectorAll('section:not(.text-center)');
-    const inputHTML = Array.from(sections).map(s => s.outerHTML).join('');
-
-    // 填入兩邊
-    document.getElementById('inputsA').innerHTML = inputHTML.replaceAll('id="', 'id="A_');
-    document.getElementById('inputsB').innerHTML = inputHTML.replaceAll('id="', 'id="B_');
-
-    // ===== 初始化輸入與事件 =====
+    // 3️⃣ 初始化欄位與事件
     function setupCalc(side) {
       fields.forEach(id => {
         const el = document.getElementById(`${side}_${id}`);
+        const saved = localStorage.getItem(`${side}_${id}`);
+        if (saved !== null) el.value = saved;
         el.addEventListener('input', () => {
           localStorage.setItem(`${side}_${id}`, el.value);
           calculate(side);
           if (side === 'A') syncInputs();
         });
-        const saved = localStorage.getItem(`${side}_${id}`);
-        if (saved !== null) el.value = saved;
       });
     }
 
@@ -84,7 +95,7 @@
     calculate('A');
     calculate('B');
 
-    // ===== 同步右側欄位（當B沒填值時） =====
+    // 4️⃣ 同步右邊空白欄位
     function syncInputs() {
       fields.forEach(id => {
         const left = document.getElementById(`A_${id}`);
@@ -98,7 +109,7 @@
       });
     }
 
-    // ===== 計算邏輯（複製原有calculate並改成接收side） =====
+    // 5️⃣ 計算邏輯 (照你原本的 calculate 改成接收 side)
     function calculate(side) {
       const v = id => parseFloat(document.getElementById(`${side}_${id}`).value) || 0;
 
@@ -162,7 +173,7 @@
       `;
     }
 
-    // ===== 重設按鈕 =====
+    // 6️⃣ 重設
     document.getElementById('resetBtn').addEventListener('click', () => {
       if (!confirm('確定要清除所有數值嗎？')) return;
       ['A','B'].forEach(side=>{
@@ -172,6 +183,7 @@
         });
         document.getElementById(`result${side}`).innerText='請輸入數值';
       });
+      syncInputs();
     });
   </script>
 </body>
