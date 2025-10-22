@@ -10,31 +10,32 @@
 
   <h1 class="text-3xl font-bold mb-6">774 雙裝備比較計算機</h1>
 
-  <!-- 兩欄主容器 -->
-  <div class="flex flex-col md:flex-row gap-6 w-full max-w-5xl justify-center">
+  <!-- 主容器 -->
+  <div class="flex flex-col md:flex-row gap-6 w-full max-w-6xl justify-center">
 
-    <!-- 左側：裝備A -->
-    <div id="calcA" class="bg-white shadow-lg rounded-2xl p-4 w-full md:w-1/2 space-y-6 text-[15px] leading-tight">
+    <!-- 裝備A -->
+    <div class="bg-white shadow-lg rounded-2xl p-4 w-full md:w-1/2 space-y-6 text-[15px] leading-tight" id="A">
       <h2 class="text-lg font-semibold border-b pb-2 mb-4 text-center">【裝備 A】</h2>
-      <div id="inputsA"></div>
-      <div class="text-center space-y-2 border-t pt-3">
-        <p class="text-base font-semibold">【A計算結果】</p>
+      <div id="contentA"></div>
+      <section class="text-center space-y-2 border-t pt-3">
+        <p class="text-base font-semibold">【計算結果】</p>
         <div id="resultA" class="text-sm text-gray-700 leading-relaxed">請輸入數值</div>
-      </div>
+      </section>
     </div>
 
-    <!-- 右側：裝備B -->
-    <div id="calcB" class="bg-white shadow-lg rounded-2xl p-4 w-full md:w-1/2 space-y-6 text-[15px] leading-tight">
+    <!-- 裝備B -->
+    <div class="bg-white shadow-lg rounded-2xl p-4 w-full md:w-1/2 space-y-6 text-[15px] leading-tight" id="B">
       <h2 class="text-lg font-semibold border-b pb-2 mb-4 text-center">【裝備 B】</h2>
-      <div id="inputsB"></div>
-      <div class="text-center space-y-2 border-t pt-3">
-        <p class="text-base font-semibold">【B計算結果】</p>
+      <div id="contentB"></div>
+      <section class="text-center space-y-2 border-t pt-3">
+        <p class="text-base font-semibold">【計算結果】</p>
         <div id="resultB" class="text-sm text-gray-700 leading-relaxed">請輸入數值</div>
-      </div>
+      </section>
     </div>
+
   </div>
 
-  <!-- 結果比較 -->
+  <!-- 差異顯示 -->
   <div class="mt-6 bg-white shadow-md rounded-xl p-4 text-center w-full max-w-md">
     <p class="text-base font-semibold mb-2">【裝備差異】</p>
     <div id="compareResult" class="text-lg font-bold text-blue-600">請輸入完整數值</div>
@@ -42,117 +43,198 @@
   </div>
 
   <script>
-    // 欄位定義
+    // 來源欄位清單（取自原始）
     const fields = [
-      ['atkPanel','面板攻擊力',''],
-      ['atkBase','基礎攻擊力',''],
-      ['formAtk','陣型提升攻擊力','%'],
-      ['skillRate','招式倍率','%'],
-      ['critDmg','暴擊傷害','%'],
-      ['buffAtk','攻擊力增加','%'],
-      ['weakDmg','弱點傷害量增加','%'],
-      ['revengeDmg','傷害量增加','%'],
-      ['buffCritDMG','暴擊傷害增加','%'],
-      ['deffDown','減少防禦力','%'],
-      ['deffIgnore','無視防禦','%'],
-      ['petAtkFlat','寵物攻擊力',''],
-      ['petAtkPercent','潛能：增加攻擊力','%'],
-      ['petSkillAtk','技能：增加攻擊力','%'],
-      ['petCritDmg','技能：增加暴擊傷害','%'],
-      ['petDmgIncrese','技能：增加傷害','%'],
-      ['enemyDef','敵方防禦力',''],
-      ['reduceRate','物理/魔法減傷','%'],
-      ['enemyDefIncrease','增加防禦力','%']
+      'atkPanel', 'atkBase', 'formAtk', 'buffAtk', 'skillRate', 'critDmg',
+      'weakDmg', 'revengeDmg', 'petAtkFlat', 'petSkillAtk', 'petCritDmg',
+      'petAtkPercent', 'enemyDef', 'reduceRate', 'setEffect','buffCritDMG','deffDown','deffIgnore','enemyDefIncrease','petDmgIncrese'
     ];
 
-    // 動態生成欄位
-    function buildInputs(prefix, containerId) {
-      const container = document.getElementById(containerId);
-      fields.forEach(([id,label,unit])=>{
-        const div = document.createElement('div');
-        div.className = 'flex justify-between items-center mb-1';
-        div.innerHTML = `
+    // 套用原本HTML區塊一次生成
+    const baseHtml = `
+      <section>
+        <h2 class="text-lg font-semibold border-b pb-2 mb-4">【主輸出】</h2>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center"><label>面板攻擊力</label><input id="atkPanel" type="number" class="border rounded p-1.5 w-28 text-right"></div>
+          <div class="flex justify-between items-center"><label>基礎攻擊力</label><input id="atkBase" type="number" class="border rounded p-1.5 w-28 text-right"></div>
+          <div class="flex justify-between items-center"><label>招式倍率</label><div class="relative w-28"><input id="skillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
+          <div class="flex justify-between items-center"><label>暴擊傷害</label><div class="relative w-28"><input id="critDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
+          <div class="flex justify-between items-center"><label>陣型提升攻擊力</label><div class="relative w-28"><input id="formAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
+        </div>
+        <div class="mt-4 border-t pt-3">
+          <select id="setEffect" class="border rounded p-2 w-full">
+            <option value="none">無套裝效果</option>
+            <option value="tracker4">追蹤者四件套（弱點傷害 +35%）</option>
+            <option value="assassin4">刺客四件套（無視防禦 +15%）</option>
+            <option value="avenger2">復仇者兩件套（傷害量 +15%）</option>
+            <option value="avenger4">復仇者四件套（傷害量 +30%）</option>
+            <option value="avenger4Boss">復仇者四件套（BOSS 傷害量 +70%）</option>
+          </select>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold border-b pb-2 mb-4">【BUFF（選填）】</h2>
+        ${createInputs([
+          ['buffAtk','攻擊力增加','%'],
+          ['weakDmg','弱點傷害量增加','%'],
+          ['revengeDmg','傷害量增加','%'],
+          ['buffCritDMG','暴擊傷害增加','%'],
+          ['deffDown','減少防禦力','%'],
+          ['deffIgnore','無視防禦','%']
+        ])}
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold border-b pb-2 mb-4">【寵物效果】</h2>
+        ${createInputs([
+          ['petAtkFlat','寵物攻擊力',''],
+          ['petAtkPercent','潛能：增加攻擊力','%'],
+          ['petSkillAtk','技能：增加攻擊力','%'],
+          ['petCritDmg','技能：增加暴擊傷害','%'],
+          ['petDmgIncrese','技能：增加傷害','%']
+        ])}
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold border-b pb-2 mb-4">【敵方防禦】</h2>
+        ${createInputs([
+          ['enemyDef','敵方防禦力',''],
+          ['reduceRate','物理/魔法減傷','%'],
+          ['enemyDefIncrease','增加防禦力','%']
+        ])}
+      </section>
+    `;
+
+    function createInputs(list) {
+      return list.map(([id,label,unit]) => `
+        <div class="flex justify-between items-center">
           <label>${label}</label>
           <div class="relative w-28">
-            <input id="${prefix}_${id}" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
+            <input id="${id}" type="number" class="border rounded p-1.5 w-full text-right pr-6">
             ${unit ? `<span class="absolute right-2 top-1.5 text-gray-400">${unit}</span>` : ''}
-          </div>`;
-        container.appendChild(div);
-      });
+          </div>
+        </div>
+      `).join('');
     }
 
-    buildInputs('A','inputsA');
-    buildInputs('B','inputsB');
+    // 注入內容到A/B
+    document.getElementById("contentA").innerHTML = baseHtml;
+    document.getElementById("contentB").innerHTML = baseHtml;
 
-    // 計算核心函式
-    function calc(prefix){
-      const v = id => parseFloat(document.getElementById(`${prefix}_${id}`).value) || 0;
-      const formAtk = v('formAtk')/100, skillRate=v('skillRate')/100, critDmg=v('critDmg')/100;
-      const buffAtk=v('buffAtk')/100, weakDmg=(v('weakDmg')+30)/100, revengeDmg=v('revengeDmg')/100;
-      const buffCritDMG=v('buffCritDMG')/100, deffDown=v('deffDown')/100, deffIgnore=v('deffIgnore')/100;
-      const petAtkFlat=v('petAtkFlat'), petSkillAtk=v('petSkillAtk')/100, petCritDmg=v('petCritDmg')/100;
-      const petAtkPercent=v('petAtkPercent')/100, petDmgIncrese=v('petDmgIncrese')/100;
-      const enemyDef=v('enemyDef'), reduceRate=v('reduceRate')/100, enemyDefIncrease=v('enemyDefIncrease')/100;
+    // 計算邏輯（原始保留）
+    function calculate(prefix) {
+      const v = id => parseFloat(document.querySelector(`#${prefix} #${id}`).value) || 0;
 
-      const DEF_CONST=467;
-      const defRate=(1-((enemyDef*(1-deffDown+enemyDefIncrease)*(1-deffIgnore))/(DEF_CONST+(enemyDef*(1-deffDown+enemyDefIncrease)*(1-deffIgnore)))))*(1-reduceRate);
-      const atkTotal=(v('atkPanel')+v('atkBase')*(formAtk+petAtkPercent)+petAtkFlat)*(1+buffAtk+petSkillAtk);
-      const revengeDmgTotal=revengeDmg, weakDmgTotal=weakDmg;
+      const atkPanel = v('atkPanel');
+      const atkBase = v('atkBase');
+      const formAtk = v('formAtk') / 100;
+      const skillRate = v('skillRate') / 100;
+      const critDmg = v('critDmg') / 100;
+      const buffAtk = v('buffAtk') / 100;
+      const weakDmg = (v('weakDmg')+30) / 100;
+      const revengeDmg = v('revengeDmg') / 100;
+      const buffCritDMG = v('buffCritDMG') / 100;
+      const deffDown = v('deffDown')/100;
+      const deffIgnore = v('deffIgnore')/100;
+      const petAtkFlat = v('petAtkFlat');
+      const petSkillAtk = v('petSkillAtk') / 100;
+      const petCritDmg = v('petCritDmg') / 100;
+      const petAtkPercent = v('petAtkPercent') / 100;
+      const petDmgIncrese = v('petDmgIncrese') / 100;
+      const enemyDef = v('enemyDef');
+      const reduceRate = v('reduceRate') / 100;
+      const enemyDefIncrease = v('enemyDefIncrease') / 100;
 
-      const dmgBoth=atkTotal*skillRate*(1+(critDmg+petCritDmg+buffCritDMG-1))*(1+weakDmgTotal)*(1+revengeDmgTotal+petDmgIncrese)*defRate;
-      return dmgBoth>0?dmgBoth:0;
-    }
+      const setEffect = document.querySelector(`#${prefix} #setEffect`).value;
 
-    // 同步邏輯
-    function syncAndCalc(){
-      fields.forEach(([id])=>{
-        const a=document.getElementById(`A_${id}`);
-        const b=document.getElementById(`B_${id}`);
-        if(!b.value){
-          b.value=a.value;
-          b.classList.add('bg-gray-200');
-        }else{
-          b.classList.remove('bg-gray-200');
-        }
-      });
+      let weakDmgTotal = weakDmg;
+      let revengeDmgTotal = revengeDmg;
+      let deffIgnoreTotal = deffIgnore;
 
-      const dmgA=calc('A');
-      const dmgB=calc('B');
-      const resultA=document.getElementById('resultA');
-      const resultB=document.getElementById('resultB');
-      const compare=document.getElementById('compareResult');
-
-      if(!dmgA||!dmgB){
-        resultA.innerText='請輸入數值';
-        resultB.innerText='請輸入數值';
-        compare.innerText='請輸入完整數值';
-        return;
+      switch (setEffect) {
+        case 'tracker4': weakDmgTotal += 0.35; break;
+        case 'avenger2': revengeDmgTotal += 0.15; break;
+        case 'avenger4': revengeDmgTotal += 0.30; break;
+        case 'avenger4Boss': revengeDmgTotal += 0.70; break;
+        case 'assassin4': deffIgnoreTotal += 0.15; break;
       }
 
-      resultA.innerHTML=`<span class="font-bold text-blue-600">${Math.round(dmgA).toLocaleString()}</span>`;
-      resultB.innerHTML=`<span class="font-bold text-blue-600">${Math.round(dmgB).toLocaleString()}</span>`;
-      const diff=(dmgB-dmgA)/dmgA*100;
-      const sign=diff>=0?'+':'';
-      compare.innerHTML=`B 比 A ${sign}${diff.toFixed(2)}%`;
+      const DEF_CONST = 467;
+      const defRate = (1 - ((enemyDef * (1-deffDown+enemyDefIncrease) * (1-deffIgnoreTotal)) / (DEF_CONST + (enemyDef * (1-deffDown+enemyDefIncrease) * (1-deffIgnoreTotal))))) * (1 - reduceRate);
+      const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
+
+      const dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese);
+
+      return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth };
+    }
+
+    // 更新顯示與同步邏輯
+    function updateAll() {
+      syncEmptyInputs();
+      const A = calculate("A"), B = calculate("B");
+      showResult("A", A);
+      showResult("B", B);
+      showDiff(A.dmgBoth, B.dmgBoth);
+    }
+
+    function showResult(prefix, d) {
+      const el = document.getElementById(`result${prefix}`);
+      if (!d.dmgBoth || d.dmgBoth <= 0) {
+        el.innerHTML = `<span class='text-gray-400'>請輸入完整數值</span>`;
+        return;
+      }
+      el.innerHTML = `
+        <div class="space-y-2">
+          <p><b>無暴擊弱點：</b>${Math.round(d.nono).toLocaleString()}</p>
+          <p><b>只觸發暴擊：</b>${Math.round(d.dmgCritOnly).toLocaleString()}</p>
+          <p><b>只觸發弱點：</b>${Math.round(d.dmgWeakOnly).toLocaleString()}</p>
+          <p><b>暴擊＋弱點：</b><span class="text-blue-600 font-bold">${Math.round(d.dmgBoth).toLocaleString()}</span></p>
+        </div>`;
+    }
+
+    function showDiff(a,b){
+      const diff = ((b - a) / a) * 100;
+      const res = document.getElementById("compareResult");
+      if (!a || !b) { res.innerText = "請輸入完整數值"; return; }
+      const sign = diff >= 0 ? "多" : "少";
+      res.innerHTML = `B 比 A <span class="text-${diff>=0?'green':'red'}-600 font-bold">${sign}${Math.abs(diff).toFixed(2)}%</span>`;
+    }
+
+    // 同步（僅空白格）
+    function syncEmptyInputs() {
+      fields.forEach(id => {
+        const a = document.querySelector(`#A #${id}`);
+        const b = document.querySelector(`#B #${id}`);
+        if (b && a && b.value === "") {
+          b.value = a.value;
+          b.classList.add("bg-gray-200");
+        } else if (b && b.value !== "") {
+          b.classList.remove("bg-gray-200");
+        }
+      });
     }
 
     // 綁定事件
-    document.querySelectorAll('input').forEach(i=>{
-      i.addEventListener('input',syncAndCalc);
+    document.querySelectorAll("input, select").forEach(el=>{
+      el.addEventListener("input", updateAll);
     });
 
     // 重設
-    document.getElementById('resetBtn').addEventListener('click',()=>{
-      if(!confirm('確定要清除所有數值嗎？'))return;
-      document.querySelectorAll('input').forEach(i=>{
-        i.value='';
-        i.classList.remove('bg-gray-200');
+    document.getElementById("resetBtn").addEventListener("click",()=>{
+      if(!confirm("確定要清除所有數值嗎？")) return;
+      document.querySelectorAll("input").forEach(i=>{
+        i.value="";
+        i.classList.remove("bg-gray-200");
       });
-      document.getElementById('resultA').innerText='請輸入數值';
-      document.getElementById('resultB').innerText='請輸入數值';
-      document.getElementById('compareResult').innerText='請輸入完整數值';
+      document.querySelectorAll("select").forEach(s=>s.value="none");
+      document.getElementById("resultA").innerText="請輸入數值";
+      document.getElementById("resultB").innerText="請輸入數值";
+      document.getElementById("compareResult").innerText="請輸入完整數值";
     });
-
   </script>
 </body>
 </html>
