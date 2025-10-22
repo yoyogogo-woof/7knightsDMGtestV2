@@ -3,339 +3,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>774傷害計算機</title>
+  <title>774傷害計算機（雙欄比較版）</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center py-8">
+  <h1 class="text-3xl font-bold mb-6">⚔️ 774傷害計算機（雙欄比較版）</h1>
 
-  <h1 class="text-3xl font-bold mb-6">774傷害計算機</h1>
-
-  <!-- 主容器 -->
-  <div class="bg-white shadow-lg rounded-2xl p-4 w-full max-w-[340px] space-y-6 text-[15px] leading-tight">
-
-    <!-- 主輸出 -->
-    <section>
-      <h2 class="text-lg font-semibold border-b pb-2 mb-4">🗡️ 主輸出</h2>
-      <div class="space-y-2">
-        <div class="flex justify-between items-center">
-          <label>面板攻擊力</label>
-          <input id="atkPanel" type="number" class="border rounded p-1.5 w-28 text-right" placeholder="輸入數值">
-        </div>
-        <div class="flex justify-between items-center">
-          <label>基礎攻擊力</label>
-          <input id="atkBase" type="number" class="border rounded p-1.5 w-28 text-right" placeholder="輸入數值">
-        </div>
-        <div class="flex justify-between items-center">
-          <label>招式倍率</label>
-          <div class="relative w-28">
-            <input id="skillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="輸入數值">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>暴擊傷害</label>
-          <div class="relative w-28">
-            <input id="critDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="輸入數值">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>陣型提升攻擊力</label>
-          <div class="relative w-28">
-            <input id="formAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="輸入數值">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 套裝效果 -->
-      <div class="mt-4 border-t pt-3">
-        <select id="setEffect" class="border rounded p-2 w-full">
-          <option value="none">無套裝效果</option>
-          <option value="tracker4">追蹤者四件套（弱點傷害 +35%）</option>
-          <option value="assassin4">刺客四件套（無視防禦 +15%）</option>
-          <option value="avenger2">復仇者兩件套（傷害量 +15%）</option>
-          <option value="avenger4">復仇者四件套（傷害量 +30%）</option>
-          <option value="avenger4Boss">復仇者四件套（BOSS 傷害量 +70%）</option>
-        </select>
-      </div>
-    </section>
-
-    <!-- BUFF -->
-    <section>
-      <h2 class="text-lg font-semibold border-b pb-2 mb-4">✨ BUFF（選填）</h2>
-      <div class="space-y-2">
-        <div class="flex justify-between items-center">
-          <label>攻擊力增加</label>
-          <div class="relative w-28">
-            <input id="buffAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>弱點傷害量增加</label>
-          <div class="relative w-28">
-            <input id="weakDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>傷害量增加</label>
-          <div class="relative w-28">
-            <input id="revengeDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>暴擊傷害增加</label>
-          <div class="relative w-28">
-            <input id="buffCritDMG" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>減少防禦力</label>
-          <div class="relative w-28">
-            <input id="deffDown" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>無視防禦</label>
-          <div class="relative w-28">
-            <input id="deffIgnore" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 寵物 -->
-    <section>
-      <h2 class="text-lg font-semibold border-b pb-2 mb-4">🐕 寵物</h2>
-      <div class="space-y-2">
-        <div class="flex justify-between items-center">
-          <label>寵物攻擊力</label>
-          <input id="petAtkFlat" type="number" class="border rounded p-1.5 w-28 text-right" placeholder="">
-        </div>
-        <div class="flex justify-between items-center">
-          <label>潛能：增加攻擊力</label>
-          <div class="relative w-28">
-            <input id="petAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>技能：增加攻擊力</label>
-          <div class="relative w-28">
-            <input id="petSkillAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>技能：增加暴擊傷害</label>
-          <div class="relative w-28">
-            <input id="petCritDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>技能：增加傷害</label>
-          <div class="relative w-28">
-            <input id="petDmgIncrese" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 敵人 -->
-    <section>
-      <h2 class="text-lg font-semibold border-b pb-2 mb-4">🛡️ 敵人</h2>
-      <div class="space-y-2">
-        <div class="flex justify-between items-center">
-          <label>敵方防禦力</label>
-          <input id="enemyDef" type="number" class="border rounded p-1.5 w-28 text-right" placeholder="">
-        </div>
-        <div class="flex justify-between items-center">
-          <label>物理/魔法減傷</label>
-          <div class="relative w-28">
-            <input id="reduceRate" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label>增加防禦力</label>
-          <div class="relative w-28">
-            <input id="enemyDefIncrease" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="">
-            <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 結果 -->
-    <section class="text-center space-y-2 border-t pt-3">
-      <p class="text-base font-semibold">📊 計算結果</p>
-      <div id="result" class="text-sm text-gray-700 leading-relaxed">
-        請輸入數值
-      </div>
-      <button id="resetBtn" class="bg-red-500 text-white px-5 py-2 rounded-xl hover:bg-red-600 transition">重設所有數值</button>
-    </section>
-
+  <!-- 雙欄容器 -->
+  <div class="flex flex-wrap justify-center gap-6 w-full max-w-5xl">
+    <!-- 兩欄 -->
+    <div id="columns" class="flex flex-col md:flex-row gap-6 w-full justify-center"></div>
   </div>
 
-
   <script>
-    const fields = [
-      'atkPanel', 'atkBase', 'formAtk', 'buffAtk', 'skillRate', 'critDmg',
-      'weakDmg', 'revengeDmg', 'petAtkFlat', 'petSkillAtk', 'petCritDmg', 
-      'petAtkPercent', 'enemyDef', 'reduceRate', 'setEffect','buffCritDMG','deffDown','deffIgnore','enemyDefIncrease','petDmgIncrese'
+    /* ------------------ 共用欄位設定 ------------------ */
+    const fieldList = [
+      ['atkPanel', '面板攻擊力'],
+      ['atkBase', '基礎攻擊力'],
+      ['skillRate', '招式倍率', '%'],
+      ['critDmg', '暴擊傷害', '%'],
+      ['formAtk', '陣型提升攻擊力', '%'],
+      ['setEffect', '套裝效果', 'select'],
+      ['buffAtk', '攻擊力增加', '%'],
+      ['weakDmg', '弱點傷害量增加', '%'],
+      ['revengeDmg', '傷害量增加', '%'],
+      ['buffCritDMG', '暴擊傷害增加', '%'],
+      ['deffDown', '減少防禦力', '%'],
+      ['deffIgnore', '無視防禦', '%'],
+      ['petAtkFlat', '寵物攻擊力'],
+      ['petAtkPercent', '潛能：增加攻擊力', '%'],
+      ['petSkillAtk', '技能：增加攻擊力', '%'],
+      ['petCritDmg', '技能：增加暴擊傷害', '%'],
+      ['petDmgIncrese', '技能：增加傷害', '%'],
+      ['enemyDef', '敵方防禦力'],
+      ['reduceRate', '物理/魔法減傷', '%'],
+      ['enemyDefIncrease', '增加防禦力', '%']
     ];
 
-    // 載入舊資料
-    window.onload = () => {
-  fields.forEach(id => {
-    const el = document.getElementById(id);
-    const saved = localStorage.getItem(id);
-    if (saved !== null) el.value = saved;
-  });
-  calculate();
-};
+    const setOptions = `
+      <option value="none">無套裝效果</option>
+      <option value="tracker4">追蹤者四件套（弱點傷害 +35%）</option>
+      <option value="assassin4">刺客四件套（無視防禦 +15%）</option>
+      <option value="avenger2">復仇者兩件套（傷害量 +15%）</option>
+      <option value="avenger4">復仇者四件套（傷害量 +30%）</option>
+      <option value="avenger4Boss">復仇者四件套（BOSS 傷害量 +70%）</option>
+    `;
 
-fields.forEach(id => {
-  const el = document.getElementById(id);
-  el.addEventListener('input', () => {
-    localStorage.setItem(id, el.value);
-    calculate();
-  });
-});
-
-    // 計算公式
-    function calculate() {
-  const v = id => parseFloat(document.getElementById(id).value) || 0;
-
-  const atkPanel = v('atkPanel');
-  const atkBase = v('atkBase');
-  const formAtk = v('formAtk') / 100;
-  const skillRate = v('skillRate') / 100;
-  const critDmg = v('critDmg') / 100;
-
-  const buffAtk = v('buffAtk') / 100;
-  const weakDmg = (v('weakDmg')+30) / 100;
-  const revengeDmg = v('revengeDmg') / 100;
-  const buffCritDMG = v('buffCritDMG') / 100;
-  const deffDown = v('deffDown')/100;
-  const deffIgnore = v('deffIgnore')/100;
-      
-  const petAtkFlat = v('petAtkFlat');
-  const petSkillAtk = v('petSkillAtk') / 100;
-  const petCritDmg = v('petCritDmg') / 100;
-  const petAtkPercent = v('petAtkPercent') / 100;
-  const petDmgIncrese = v('petDmgIncrese') / 100;
-  
-  
-  const enemyDef = v('enemyDef');
-  const reduceRate = v('reduceRate') / 100;
-  const enemyDefIncrease = v('enemyDefIncrease') / 100;
-  
-    
- // 套裝效果
-  const setEffect = document.getElementById('setEffect').value;
-
-  let weakDmgTotal = weakDmg;
-  let revengeDmgTotal = revengeDmg;
-  let deffIgnoreTotal = deffIgnore;
-
-  switch (setEffect) {
-    case 'tracker4':
-      weakDmgTotal += 0.35;
-      break;
-    case 'avenger2':
-      revengeDmgTotal += 0.15;
-      break;
-    case 'avenger4':
-      revengeDmgTotal += 0.30;
-      break;
-    case 'avenger4Boss':
-      revengeDmgTotal += 0.70;
-      break;
-    case 'assassin4':
-      deffIgnoreTotal += 0.15;
-      break;
-    default:
-      break;
-  }
-
-     //敵防
-  const DEF_CONST = 467;
-  const defRate = (1 - ( (enemyDef * (1-deffDown+enemyDefIncrease) * (1-deffIgnoreTotal) ) / (DEF_CONST + (enemyDef * (1-deffDown+enemyDefIncrease) * (1-deffIgnoreTotal) )))) * (1 - reduceRate);
-      
-      
-  // ---- 基礎攻擊計算 ----
-  const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
-
-  // ---- 三種傷害 ----
-  // 1️⃣ 只暴擊（弱點不吃）
-  const dmgCritOnly = atkTotal
-    * skillRate
-    * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) // 暴擊加成
-    * (1 + revengeDmgTotal + petDmgIncrese)
-    * defRate;
-
-  // 2️⃣ 只弱點（暴擊不吃，固定100%）
-  const dmgWeakOnly = atkTotal
-    * skillRate
-    * (1 + weakDmgTotal)
-    * (1 + revengeDmgTotal + petDmgIncrese)
-    * defRate;
-
-  // 3️⃣ 暴擊 + 弱點（原始最終傷害）
-  const dmgBoth = atkTotal
-    * skillRate
-    * (1 + (critDmg + petCritDmg + buffCritDMG - 1))
-    * (1 + weakDmgTotal)
-    * (1 + revengeDmgTotal + petDmgIncrese)
-    * defRate;
-
-  // ---- 顯示 ----
-  if (isNaN(dmgBoth) || dmgBoth <= 0) {
-    document.getElementById('result').innerHTML = `<span class="text-gray-400">請輸入完整數值</span>`;
-    return;
-  }
-
-  document.getElementById('result').innerHTML = `
-    <div class="space-y-2">
-      <p><b>只觸發暴擊：</b> ${Math.round(dmgCritOnly).toLocaleString()}</p>
-      <p><b>只觸發弱點：</b> ${Math.round(dmgWeakOnly).toLocaleString()}</p>
-      <p><b>暴擊＋弱點：</b> <span class="text-blue-600 font-bold">${Math.round(dmgBoth).toLocaleString()}</span></p>
-    </div>
-  `;
-}
-
-
-    // 重設按鈕
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      if (!confirm('確定要清除所有數值嗎？')) return;
-      fields.forEach(id => {
-        document.getElementById(id).value = '';
-        localStorage.removeItem(id);
-      });
-      document.getElementById('result').innerText = '請輸入數值';
+    /* ------------------ 建立欄位 ------------------ */
+    const container = document.getElementById("columns");
+    ['left', 'right'].forEach(side => {
+      const col = document.createElement("div");
+      col.className = "bg-white shadow-lg rounded-2xl p-4 w-full max-w-[340px] space-y-6 text-[15px]";
+      col.innerHTML = `
+        <h2 class="text-lg font-semibold border-b pb-2 mb-4">${side === 'left' ? '裝備 A' : '裝備 B'}</h2>
+        <div class="space-y-2">
+          ${fieldList.map(([id, label, unit]) => `
+            <div class="flex justify-between items-center">
+              <label>${label}</label>
+              ${
+                unit === 'select'
+                  ? `<select id="${id}-${side}" class="border rounded p-1.5 w-40 text-sm">${setOptions}</select>`
+                  : `
+                    <div class="relative w-28">
+                      <input id="${id}-${side}" type="number" class="border rounded p-1.5 w-full text-right pr-6 bg-white" placeholder="">
+                      ${unit === '%' ? `<span class="absolute right-2 top-1.5 text-gray-400">%</span>` : ''}
+                    </div>
+                  `
+              }
+            </div>
+          `).join('')}
+        </div>
+        <section class="text-center space-y-2 border-t pt-3">
+          <p class="text-base font-semibold">📊 計算結果</p>
+          <div id="result-${side}" class="text-sm text-gray-700 leading-relaxed">請輸入數值</div>
+        </section>
+      `;
+      container.appendChild(col);
     });
+
+    /* ------------------ 差值欄位 ------------------ */
+    const diffDiv = document.createElement("div");
+    diffDiv.className = "hidden md:flex flex-col justify-center items-center text-center";
+    diffDiv.innerHTML = fieldList.map(([id]) => `
+      <input type="number" id="${id}-diff" class="border rounded mb-[10px] w-16 text-center text-sm" placeholder="+/-">
+    `).join('');
+    container.insertBefore(diffDiv, container.children[1]);
+
+    /* ------------------ 核心邏輯 ------------------ */
+    function v(id, side) {
+      return parseFloat(document.getElementById(`${id}-${side}`).value) || 0;
+    }
+
+    function calculate(side) {
+      const atkPanel = v('atkPanel', side);
+      const atkBase = v('atkBase', side);
+      const formAtk = v('formAtk', side) / 100;
+      const skillRate = v('skillRate', side) / 100;
+      const critDmg = v('critDmg', side) / 100;
+      const buffAtk = v('buffAtk', side) / 100;
+      const weakDmg = v('weakDmg', side) / 100;
+      const revengeDmg = v('revengeDmg', side) / 100;
+      const buffCritDMG = v('buffCritDMG', side) / 100;
+      const deffDown = v('deffDown', side) / 100;
+      const deffIgnore = v('deffIgnore', side) / 100;
+      const petAtkFlat = v('petAtkFlat', side);
+      const petSkillAtk = v('petSkillAtk', side) / 100;
+      const petCritDmg = v('petCritDmg', side) / 100;
+      const petAtkPercent = v('petAtkPercent', side) / 100;
+      const petDmgIncrese = v('petDmgIncrese', side) / 100;
+      const enemyDef = v('enemyDef', side);
+      const reduceRate = v('reduceRate', side) / 100;
+      const enemyDefIncrease = v('enemyDefIncrease', side) / 100;
+      const setEffect = document.getElementById(`setEffect-${side}`).value;
+
+      let weakDmgTotal = weakDmg;
+      let revengeDmgTotal = revengeDmg;
+      let deffIgnoreTotal = deffIgnore;
+
+      switch (setEffect) {
+        case 'tracker4': weakDmgTotal += 0.35; break;
+        case 'avenger2': revengeDmgTotal += 0.15; break;
+        case 'avenger4': revengeDmgTotal += 0.30; break;
+        case 'avenger4Boss': revengeDmgTotal += 0.70; break;
+        case 'assassin4': deffIgnoreTotal += 0.15; break;
+      }
+
+      const DEF_CONST = 467;
+      const defRate = (1 - ((enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal)) /
+        (DEF_CONST + (enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal))))) * (1 - reduceRate);
+
+      const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
+
+      const dmgCrit = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const dmgWeak = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+
+      document.getElementById(`result-${side}`).innerHTML = `
+        <div class="space-y-1">
+          <p><b>只暴擊：</b>${Math.round(dmgCrit).toLocaleString()}</p>
+          <p><b>只弱點：</b>${Math.round(dmgWeak).toLocaleString()}</p>
+          <p><b>暴擊＋弱點：</b><span class="text-blue-600 font-bold">${Math.round(dmgBoth).toLocaleString()}</span></p>
+        </div>
+      `;
+      return dmgBoth;
+    }
+
+    /* ------------------ 同步邏輯與差值 ------------------ */
+    fieldList.forEach(([id]) => {
+      const left = document.getElementById(`${id}-left`);
+      const right = document.getElementById(`${id}-right`);
+      const diff = document.getElementById(`${id}-diff`);
+
+      const updateRight = () => {
+        if (right.value === "") {
+          right.classList.add("bg-gray-100");
+          right.value = left.value;
+        }
+        calculateBoth();
+      };
+
+      const applyDiff = () => {
+        const base = parseFloat(left.value) || 0;
+        const delta = parseFloat(diff.value);
+        if (!isNaN(delta)) {
+          right.value = base + delta;
+          right.classList.remove("bg-gray-100");
+        } else {
+          right.value = "";
+        }
+        calculateBoth();
+      };
+
+      [left, right].forEach(el => el.addEventListener("input", calculateBoth));
+      diff.addEventListener("input", applyDiff);
+      left.addEventListener("input", updateRight);
+    });
+
+    function calculateBoth() {
+      const dmgL = calculate('left');
+      const dmgR = calculate('right');
+      const resultRight = document.getElementById("result-right");
+      const diff = dmgL > 0 ? (((dmgR - dmgL) / dmgL) * 100).toFixed(2) : 0;
+      resultRight.innerHTML += `<p class="text-green-600 font-semibold mt-2">提升：約 ${diff}%</p>`;
+    }
+
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
