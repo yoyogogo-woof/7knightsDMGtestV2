@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>774裝備比較&傷害計算機</title>
+  <title>774 雙裝備比較計算機（最終版）</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* 鎖頭圖示 */
     .lock-icon::after {
       content: "🔒";
       position: absolute;
@@ -15,17 +14,29 @@
       font-size: 13px;
       opacity: 0.7;
     }
+
+    /* 手機也保持雙欄橫排 */
+    @media (max-width: 768px) {
+      .calc-container {
+        flex-direction: row !important;
+        flex-wrap: wrap;
+      }
+      .calc-box {
+        width: 100%;
+        max-width: 50%;
+      }
+    }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center py-8">
 
-  <h1 class="text-3xl font-bold mb-6">774裝備比較&傷害計算機</h1>
+  <h1 class="text-3xl font-bold mb-6">774 雙裝備比較計算機</h1>
 
-  <!-- 兩欄主容器 -->
-  <div class="flex flex-col md:flex-row gap-6 w-full max-w-6xl justify-center">
+  <!-- 兩欄容器 -->
+  <div class="calc-container flex flex-row gap-6 w-full max-w-6xl justify-center">
 
     <!-- 裝備A -->
-    <div class="bg-white shadow-lg rounded-2xl p-4 w-full md:w-1/2 space-y-6 text-[15px] leading-tight" id="A">
+    <div class="calc-box bg-white shadow-lg rounded-2xl p-4 w-full md:w-1/2 space-y-6 text-[15px]" id="A">
       <h2 class="text-lg font-semibold border-b pb-2 mb-4 text-center">【裝備 A】</h2>
       <div id="contentA"></div>
       <section class="text-center space-y-2 border-t pt-3">
@@ -35,7 +46,7 @@
     </div>
 
     <!-- 裝備B -->
-    <div class="bg-white shadow-lg rounded-2xl p-4 w-full md:w-1/2 space-y-6 text-[15px] leading-tight" id="B">
+    <div class="calc-box bg-white shadow-lg rounded-2xl p-4 w-full md:w-1/2 space-y-6 text-[15px]" id="B">
       <h2 class="text-lg font-semibold border-b pb-2 mb-4 text-center">【裝備 B】</h2>
       <div id="contentB"></div>
       <section class="text-center space-y-2 border-t pt-3">
@@ -55,22 +66,24 @@
 
   <script>
     const fields = [
-      'atkPanel', 'atkBase', 'formAtk', 'buffAtk', 'skillRate', 'critDmg',
-      'weakDmg', 'revengeDmg', 'petAtkFlat', 'petSkillAtk', 'petCritDmg',
-      'petAtkPercent', 'enemyDef', 'reduceRate', 'setEffect','buffCritDMG','deffDown','deffIgnore','enemyDefIncrease','petDmgIncrese'
+      'atkPanel','atkBase','formAtk','buffAtk','skillRate','critDmg',
+      'weakDmg','revengeDmg','petAtkFlat','petSkillAtk','petCritDmg',
+      'petAtkPercent','enemyDef','reduceRate','setEffect','buffCritDMG',
+      'deffDown','deffIgnore','enemyDefIncrease','petDmgIncrese'
     ];
 
-    // 建立每個欄位 HTML
     function buildPanelHtml() {
       return `
         <section>
           <div class="space-y-2">
-            <div class="flex justify-between items-center"><label>面板攻擊力</label><input id="atkPanel" type="number" class="border rounded p-1.5 w-28 text-right"></div>
-            <div class="flex justify-between items-center"><label>基礎攻擊力</label><input id="atkBase" type="number" class="border rounded p-1.5 w-28 text-right"></div>
-            <div class="flex justify-between items-center"><label>招式倍率</label><div class="relative w-28"><input id="skillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-            <div class="flex justify-between items-center"><label>暴擊傷害</label><div class="relative w-28"><input id="critDmg" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
-            <div class="flex justify-between items-center"><label>陣型提升攻擊力</label><div class="relative w-28"><input id="formAtk" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div></div>
+            ${inputRow('atkPanel','面板攻擊力')}
+            ${inputRow('atkBase','基礎攻擊力')}
+            ${inputRow('skillRate','招式倍率','%')}
+            ${inputRow('critDmg','暴擊傷害','%')}
+            ${inputRow('formAtk','陣型提升攻擊力','%')}
           </div>
+
+          <hr class="my-4 border-gray-300">
 
           <div class="mt-4">
             <select id="setEffect" class="border rounded p-2 w-full">
@@ -99,7 +112,7 @@
 
           <h2 class="text-lg font-semibold mb-2">【寵物效果】</h2>
           <div class="space-y-2">
-            ${inputRow('petAtkFlat','寵物攻擊力','')}
+            ${inputRow('petAtkFlat','寵物攻擊力')}
             ${inputRow('petAtkPercent','潛能：增加攻擊力','%')}
             ${inputRow('petSkillAtk','技能：增加攻擊力','%')}
             ${inputRow('petCritDmg','技能：增加暴擊傷害','%')}
@@ -110,36 +123,35 @@
 
           <h2 class="text-lg font-semibold mb-2">【敵方防禦】</h2>
           <div class="space-y-2">
-            ${inputRow('enemyDef','敵方防禦力','')}
+            ${inputRow('enemyDef','敵方防禦力')}
             ${inputRow('reduceRate','物理/魔法減傷','%')}
             ${inputRow('enemyDefIncrease','增加防禦力','%')}
           </div>
+
+          <hr class="my-4 border-gray-300">
         </section>
       `;
     }
 
-    function inputRow(id, label, unit) {
+    function inputRow(id,label,unit){
       return `
-        <div class="flex justify-between items-center">
-          <label>${label}</label>
-          <div class="relative w-28">
-            <input id="${id}" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-            ${unit ? `<span class="absolute right-2 top-1.5 text-gray-400">${unit}</span>` : ''}
-          </div>
-        </div>`;
+      <div class="flex justify-between items-center">
+        <label>${label}</label>
+        <div class="relative w-28">
+          <input id="${id}" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+          ${unit?`<span class="absolute right-2 top-1.5 text-gray-400">${unit}</span>`:''}
+        </div>
+      </div>`;
     }
 
-    // 注入內容
-    document.getElementById('contentA').innerHTML = buildPanelHtml();
-    document.getElementById('contentB').innerHTML = buildPanelHtml();
+    document.getElementById('contentA').innerHTML=buildPanelHtml();
+    document.getElementById('contentB').innerHTML=buildPanelHtml();
 
-    const el = (p,id) => document.querySelector(`#${p} #${id}`);
+    const el=(p,id)=>document.querySelector(`#${p} #${id}`);
+    const save=(p,id,v)=>localStorage.setItem(`${p}_${id}`,v);
+    const load=(p,id)=>localStorage.getItem(`${p}_${id}`);
 
-    // localStorage 儲存/載入
-    const save = (p,id,v)=>localStorage.setItem(`${p}_${id}`,v);
-    const load = (p,id)=>localStorage.getItem(`${p}_${id}`);
-
-    function loadSaved() {
+    function loadSaved(){
       ['A','B'].forEach(p=>{
         fields.forEach(id=>{
           const v=load(p,id);
@@ -149,9 +161,8 @@
       });
     }
 
-    // 原始公式（不變）
-    function calculate(prefix) {
-      const v = id => parseFloat(el(prefix, id)?.value) || 0;
+    function calculate(prefix){
+      const v=id=>parseFloat(el(prefix,id)?.value)||0;
       const atkPanel=v('atkPanel'),atkBase=v('atkBase'),formAtk=v('formAtk')/100,skillRate=v('skillRate')/100,critDmg=v('critDmg')/100;
       const buffAtk=v('buffAtk')/100,weakDmg=(v('weakDmg')+30)/100,revengeDmg=v('revengeDmg')/100,buffCritDMG=v('buffCritDMG')/100,deffDown=v('deffDown')/100,deffIgnore=v('deffIgnore')/100;
       const petAtkFlat=v('petAtkFlat'),petSkillAtk=v('petSkillAtk')/100,petCritDmg=v('petCritDmg')/100,petAtkPercent=v('petAtkPercent')/100,petDmgIncrese=v('petDmgIncrese')/100;
@@ -196,7 +207,6 @@
       res.innerHTML=`B 比 A <span class="${color} font-bold">${sign}${Math.abs(diff).toFixed(2)}%</span>`;
     }
 
-    // --- 同步邏輯 ---
     function syncFromAtoB(id){
       const a=el('A',id),b=el('B',id);
       if(!a||!b)return;
@@ -207,23 +217,15 @@
       save('B',id,b.value);
     }
 
-    function syncAll(){
-      fields.forEach(id=>syncFromAtoB(id));
-    }
+    function syncAll(){fields.forEach(id=>syncFromAtoB(id));}
 
-    // --- 事件 ---
     function onInput(e){
       const n=e.target,p=n.closest('#A')?'A':'B';
       save(p,n.id,n.value);
       if(p==='A')syncFromAtoB(n.id);
       if(p==='B'){
-        if(n.value!==''){
-          n.dataset.userEdited='true';
-          n.classList.remove('bg-gray-200','lock-icon');
-        }else{
-          n.dataset.userEdited='false';
-          syncFromAtoB(n.id);
-        }
+        if(n.value!==''){n.dataset.userEdited='true';n.classList.remove('bg-gray-200','lock-icon');}
+        else{n.dataset.userEdited='false';syncFromAtoB(n.id);}
       }
       updateDisplay();
     }
@@ -236,7 +238,6 @@
       showDiff(A.dmgBoth,B.dmgBoth);
     }
 
-    // Reset
     function resetAll(){
       if(!confirm('確定要清除所有數值嗎？'))return;
       ['A','B'].forEach(p=>fields.forEach(id=>localStorage.removeItem(`${p}_${id}`)));
@@ -248,7 +249,6 @@
       document.getElementById('compareResult').innerText='請輸入完整數值';
     }
 
-    // 初始化
     loadSaved();
     document.querySelectorAll('input,select').forEach(i=>{
       i.addEventListener('input',onInput);
