@@ -436,31 +436,34 @@
       const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDMG + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       const nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
 
-      //追加傷害：艾絲芭塔－神的審判
-      const enemyHp = v('enemyHp');
-      const enemyHp = v('hpPercent')/100;
-      const enemyHp = v('limitAtkPercent')/100;
-      
-      const espadaEnemyHP = enemyHp * hpPercent ;
-      const espadaMaxATK = atkTotal * limitAtkPercent ;
-      const espadaCompaare = espadaEnemyHP > espadaMaxATK ? espadaMaxATK : espadaEnemyHP;
+      // ===== 追加傷害：艾絲芭塔－神的審判 =====
+  let espadaFinalValue = 0;
+  const addType = get(prefix, 'addDmgType')?.value;
+  if (addType === 'asparta') {
+    const enemyHp = v('enemyHp');
+    const hpPercent = v('hpPercent') / 100;
+    const limitAtkPercent = v('limitAtkPercent') / 100;
 
-      const espadaFinalValue = espadaCompaare * (1 + (critDmg + petCritDMG + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+    const espadaEnemyHP = enemyHp * hpPercent;
+    const espadaMaxATK = atkTotal * limitAtkPercent;
+    const espadaCompare = espadaEnemyHP > espadaMaxATK ? espadaMaxATK : espadaEnemyHP;
 
-      // 回傳（保留擴充空間：之後可把追加傷害算進來）
-      return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth, defRate };
-    }
+    espadaFinalValue = espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * 
+                       (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+  }
 
-    // 顯示結果
-    function showResults(prefix, data) {
-      const fmt = (x) => !x || x<=0 ? '-' : Math.round(x).toLocaleString();
-      $(`${prefix}_nono`).textContent = fmt(data.nono);
-      $(`${prefix}_dmgCritOnly`).textContent = fmt(data.dmgCritOnly);
-      $(`${prefix}_dmgWeakOnly`).textContent = fmt(data.dmgWeakOnly);
-      $(`${prefix}_dmgBoth`).textContent = fmt(data.dmgBoth);
+  return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth, defRate, espadaFinalValue };
+}
 
-       $(`${prefix}_espadaFinalValue`).textContent = fmt(data.espadaFinalValue);
-    }
+// 顯示結果
+function showResults(prefix, data) {
+  const fmt = (x) => !x || x<=0 ? '-' : Math.round(x).toLocaleString();
+  $(`${prefix}_nono`).textContent = fmt(data.nono);
+  $(`${prefix}_dmgCritOnly`).textContent = fmt(data.dmgCritOnly);
+  $(`${prefix}_dmgWeakOnly`).textContent = fmt(data.dmgWeakOnly);
+  $(`${prefix}_dmgBoth`).textContent = fmt(data.dmgBoth);
+  $(`${prefix}_espadaFinalValue`).textContent = fmt(data.espadaFinalValue);
+}
 
     // 差異顯示
     function showDiff(a, b) {
@@ -584,4 +587,5 @@
   </script>
 </body>
 </html>
+
 
