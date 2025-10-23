@@ -317,7 +317,7 @@
       });
     }
 
-    // 計算函式（依原邏輯）
+    // 計算函式
     function calc(prefix) {
       const v = (f) => parseFloat(get(prefix,f)?.value) || 0;
 
@@ -359,19 +359,16 @@
       }
 
       const DEF_CONST = 467;
-      const defRate = Math.trunc(
-          (1 - ((enemyDef*(1 - deffDown + enemyDefIncrease)*(1 - deffIgnoreTotal)) /
-          (DEF_CONST + (enemyDef*(1 - deffDown + enemyDefIncrease)*(1 - deffIgnoreTotal))))) * (1 - reduceRate)
-          * 10000
-          ) / 10000;
+      const defCalc = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal)
+      const defRate = Math.trunc ( ( defCalc / DEF_CONST + defCalc ) * 10000 ) / 10000;
 
 
       const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
 
-      const dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      const dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      const nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * ( 1 - defRate ) * (1 - reduceRate) ;
+      const dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * ( 1 - defRate ) * (1 - reduceRate) ;
+      const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * ( 1 - defRate ) * (1 - reduceRate) ;
+      const nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * ( 1 - defRate ) * (1 - reduceRate) ;
 
       return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth };
     }
@@ -506,6 +503,7 @@
   </script>
 </body>
 </html>
+
 
 
 
