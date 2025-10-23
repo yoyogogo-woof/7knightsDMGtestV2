@@ -359,7 +359,12 @@
       }
 
       const DEF_CONST = 467;
-      const defRate = (1 - ((enemyDef*(1-deffDown+enemyDefIncrease)*(1-deffIgnoreTotal)) / (DEF_CONST + (enemyDef*(1-deffDown+enemyDefIncrease)*(1-deffIgnoreTotal))))) * (1 - reduceRate);
+      const defRate = Number(
+        ((1 - ((enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal) ) /
+        (DEF_CONST + (enemyDef*(1 - deffDown + enemyDefIncrease)*(1 - deffIgnoreTotal))))) * (1 - reduceRate)
+        ).toFixed(4)
+      );
+
 
       const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
 
@@ -501,6 +506,7 @@
   </script>
 </body>
 </html>
+
 
 
 
