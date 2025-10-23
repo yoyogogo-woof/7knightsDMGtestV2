@@ -360,8 +360,8 @@
 
     const DEF_CONST = 467;
     const defCalc = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal);
-    const rawDefRate = (1 - (defCalc / (DEF_CONST + defCalc))) * (1 - reduceRate);
-    const defRate = Math.trunc(rawDefRate * 10000) / 10000; // 無條件捨去4位
+    const rawDefRate = Math.trunc ( ( defCalc / (DEF_CONST + defCalc) ) * 10000 ) / 10000 ;
+    const defRate = (1 - rawDefRate) * (1 - reduceRate) ;
 
     const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
 
@@ -516,6 +516,7 @@
 
 </body>
 </html>
+
 
 
 
