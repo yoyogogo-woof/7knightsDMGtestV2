@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>774傷害計算機</title>
+  <title>774傷害計算機（完整版）</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* B 欄自動同步時顯示鎖頭 */
@@ -16,7 +16,7 @@
       opacity: 0.75;
       pointer-events: none;
     }
-    /* 三欄結構 */
+    /* 三欄結構（手機也維持三欄） */
     .three-col-grid {
       display: grid;
       grid-template-columns: 1fr 0.8fr 0.8fr;
@@ -314,7 +314,7 @@
             <td class="p-2 border-b text-right text-blue-600 font-semibold" id="A_dmgBoth">-</td>
             <td class="p-2 border-b text-right text-blue-600 font-semibold" id="B_dmgBoth">-</td>
           </tr>
-            <tr>
+          <tr>
             <td class="p-2 border-b">追加傷害</td>
             <td class="p-2 border-b text-right" id="A_espadaFinalValue">-</td>
             <td class="p-2 border-b text-right" id="B_espadaFinalValue">-</td>
@@ -331,13 +331,13 @@
   </div>
 
   <script>
-    // 欄位清單（追加傷害欄位也納入：可儲存/同步）
+    // 欄位清單（包含追加傷害欄位：可儲存/同步）
     const fieldList = [
       'atkPanel','atkBase','skillRate','critDmg','formAtk',
       'addDmgType','enemyHp','hpPercent','limitAtkPercent',
       'setEffect','buffAtk','weakDmg','revengeDmg','buffCritDMG',
       'deffDown','deffIgnore','petAtkFlat','petAtkPercent','petSkillAtk',
-      'petCritDmg','petDmgIncrese','enemyDef','reduceRate','enemyDefIncrease','enemyHp','hpPercent','limitAtkPercent'
+      'petCritDmg','petDmgIncrese','enemyDef','reduceRate','enemyDefIncrease'
     ];
 
     // 工具函式
@@ -383,7 +383,7 @@
       refreshAddDmgUI();
     }
 
-    // 計算（不含追加傷害）
+    // 計算（主輸出；追加傷害僅計算顯示，不納入比較）
     function calc(prefix) {
       const v = (f) => parseFloat(get(prefix,f)?.value) || 0;
 
@@ -424,48 +424,50 @@
         case 'assassin4': deffIgnoreTotal += 0.15; break;
       }
 
-       const DEF_CONST = 467;
-       const defCalc = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal);
-     　const rawDefRate = Math.trunc ( ( defCalc / (DEF_CONST + defCalc) ) * 10000 ) / 10000 ;
-       const defRate = (1 - rawDefRate) * (1 - reduceRate) ;
+      // 防禦倍率（無條件捨去小數第4位），並作為「倍率」使用
+      const DEF_CONST = 467;
+      const defCalc = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal);
+      const rawDefRate = (1 - (defCalc / (DEF_CONST + defCalc))) * (1 - reduceRate);
+      const defRate = Math.trunc(rawDefRate * 10000) / 10000;
 
+      // 總攻
       const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
 
-      const dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDMG + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      // 主輸出
+      const dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       const dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDMG + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      const nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const dmgBoth     = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const nono        = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
 
-      // ===== 追加傷害：艾絲芭塔－神的審判 =====
-  let espadaFinalValue = 0;
-  const addType = get(prefix, 'addDmgType')?.value;
-  if (addType === 'asparta') {
-    const enemyHp = v('enemyHp');
-    const hpPercent = v('hpPercent') / 100;
-    const limitAtkPercent = v('limitAtkPercent') / 100;
+      // 追加傷害（只顯示，不納入主輸出比較）
+      let espadaFinalValue = 0;
+      const addType = get(prefix, 'addDmgType')?.value;
+      if (addType === 'asparta') {
+        const enemyHp = v('enemyHp');
+        const hpPercent = v('hpPercent') / 100;
+        const limitAtkPercent = v('limitAtkPercent') / 100;
+        const espadaEnemyHP = enemyHp * hpPercent;
+        const espadaMaxATK  = atkTotal * limitAtkPercent; // 以總攻為上限（符合你先前寫法）
+        const espadaCompare = espadaEnemyHP > espadaMaxATK ? espadaMaxATK : espadaEnemyHP;
+        // 這裡僅顯示最終追加傷害（不再乘以暴擊/弱點/防禦等；若要套用可自行打開下行計算）
+        // espadaFinalValue = espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+        espadaFinalValue = espadaCompare;
+      }
 
-    const espadaEnemyHP = enemyHp * hpPercent;
-    const espadaMaxATK = atkTotal * limitAtkPercent;
-    const espadaCompare = espadaEnemyHP > espadaMaxATK ? espadaMaxATK : espadaEnemyHP;
+      return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth, defRate, espadaFinalValue };
+    }
 
-    espadaFinalValue = espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * 
-                       (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-  }
+    // 顯示結果
+    function showResults(prefix, data) {
+      const fmt = (x) => !x || x<=0 ? '-' : Math.round(x).toLocaleString();
+      $(`${prefix}_nono`).textContent        = fmt(data.nono);
+      $(`${prefix}_dmgCritOnly`).textContent = fmt(data.dmgCritOnly);
+      $(`${prefix}_dmgWeakOnly`).textContent = fmt(data.dmgWeakOnly);
+      $(`${prefix}_dmgBoth`).textContent     = fmt(data.dmgBoth);
+      $(`${prefix}_espadaFinalValue`).textContent = fmt(data.espadaFinalValue);
+    }
 
-  return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth, defRate, espadaFinalValue };
-}
-
-// 顯示結果
-function showResults(prefix, data) {
-  const fmt = (x) => !x || x<=0 ? '-' : Math.round(x).toLocaleString();
-  $(`${prefix}_nono`).textContent = fmt(data.nono);
-  $(`${prefix}_dmgCritOnly`).textContent = fmt(data.dmgCritOnly);
-  $(`${prefix}_dmgWeakOnly`).textContent = fmt(data.dmgWeakOnly);
-  $(`${prefix}_dmgBoth`).textContent = fmt(data.dmgBoth);
-  $(`${prefix}_espadaFinalValue`).textContent = fmt(data.espadaFinalValue);
-}
-
-    // 差異顯示
+    // 差異顯示（僅使用主輸出「暴擊＋弱點」來比較）
     function showDiff(a, b) {
       const box = $('compareResult');
       if (!a || !b || a<=0 || b<=0) { box.textContent = '請輸入完整數值'; return; }
@@ -492,9 +494,7 @@ function showResults(prefix, data) {
       if (field === 'addDmgType') toggleAddDmgVisibility('B');
     }
 
-    function syncAll() {
-      fieldList.forEach(syncField);
-    }
+    function syncAll() { fieldList.forEach(syncField); }
 
     // 更新畫面
     function updateAll() {
@@ -562,10 +562,9 @@ function showResults(prefix, data) {
         $(`${p}_dmgCritOnly`).textContent='-';
         $(`${p}_dmgWeakOnly`).textContent='-';
         $(`${p}_dmgBoth`).textContent='-';
+        $(`${p}_espadaFinalValue`).textContent='-';
       });
       $('compareResult').textContent='請輸入完整數值';
-
-      // 追加傷害區塊收起
       refreshAddDmgUI();
     }
 
@@ -587,5 +586,3 @@ function showResults(prefix, data) {
   </script>
 </body>
 </html>
-
-
