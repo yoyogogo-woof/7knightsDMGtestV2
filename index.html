@@ -232,6 +232,16 @@
         <div class="relative"><input id="B_enemyDefIncrease" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
       </div>
     </div>
+    
+    <!-- 防禦率顯示 -->
+        <div id="defRateDisplay" class="text-sm text-gray-700 mt-2 ml-1 italic">
+        實際防禦倍率：
+        <span id="defRateValueA" class="font-semibold text-blue-600">A: -</span>
+        ｜ 
+         <span id="defRateValueB" class="font-semibold text-green-600">B: -</span>
+      </div>
+
+    
     <!-- 敵方防禦 下方分隔線 -->
     <hr class="border-gray-300">
 
@@ -248,8 +258,8 @@
         <tbody id="resultTable">
           <tr>
             <td class="p-2 border-b">無暴擊弱點</td>
-            <td class="p-2 border-b text-right" id="A_nono">-</td>
-            <td class="p-2 border-b text-right" id="B_nono">-</td>
+            <td class="p-2 border-b text-right" id="A_">-</td>
+            <td class="p-2 border-b text-right" id="B_">-</td>
           </tr>
           <tr>
             <td class="p-2 border-b">只觸發暴擊</td>
@@ -371,9 +381,9 @@
       const dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       const dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      const nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      const  = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
 
-      return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth };
+      return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth,defRate };
     }
 
     // 顯示結果到表格
@@ -394,6 +404,7 @@
       const color = diff >= 0 ? 'text-green-600' : 'text-red-600';
       box.innerHTML = `B 比 A <span class="${color} font-bold">${sign}${Math.abs(diff).toFixed(2)}%</span>`;
     }
+
 
     // 同步（A -> B）僅空白或未被手動編輯過的欄位
     function syncField(field) {
@@ -424,6 +435,14 @@
       showResults('A', A);
       showResults('B', B);
       showDiff(A.dmgBoth, B.dmgBoth);
+      // 顯示雙方防禦倍率（無條件捨去至小數第4位）
+      const Adef = calc('A').defRate;
+      const Bdef = calc('B').defRate;
+
+      document.getElementById("defRateValueA").textContent =
+        `A: ${Adef ? Adef.toFixed(4) : '-'}`;
+      document.getElementById("defRateValueB").textContent =
+        `B: ${Bdef ? Bdef.toFixed(4) : '-'}`;
     }
 
     // 輸入事件處理
@@ -506,6 +525,7 @@
   </script>
 </body>
 </html>
+
 
 
 
