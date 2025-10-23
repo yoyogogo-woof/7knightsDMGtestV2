@@ -366,7 +366,7 @@
       const dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       const dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      const nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese);
+      const nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
 
       return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth };
     }
@@ -501,6 +501,7 @@
   </script>
 </body>
 </html>
+
 
 
 
