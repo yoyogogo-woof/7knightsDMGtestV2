@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>774傷害計算機（完整版）</title>
+  <title>774傷害計算機（修正版）</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* B 欄自動同步時顯示鎖頭 */
@@ -20,18 +19,41 @@
     /* 三欄結構（手機也維持三欄） */
     .three-col-grid {
       display: grid;
-      grid-template-columns: 1fr 0.8fr 0.8fr;
+      grid-template-columns: 0.5fr 0.5fr 0.5fr;
       gap: 4px;
       align-items: center;
     }
     .row { display: contents; } /* 讓每個子元素自然落在三個欄 */
+
+    /* 追加傷害展開子列：左文字 / 右輸入 */
+    .adddmg-subrow {
+      display: grid;
+      grid-template-columns: 1fr 0.8fr;
+      gap: 4px;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .adddmg-subrow label {
+      text-align: left;
+      padding-left: 4px;
+    }
+
+    /* 讓外層容器在手機也置中且不貼邊 */
+    .container-fixed {
+      max-width: 50rem; /* ~max-w-5xl */
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: .25rem;
+      padding-right: .25rem;
+    }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center py-8">
 
   <h1 class="text-3xl font-bold mb-6">774傷害計算機</h1>
 
-  <div class="bg-white shadow-lg rounded-2xl p-4 w-full max-w-5xl space-y-4 text-[15px] leading-tight mx-auto px-2">
+  <div class="bg-white shadow-lg rounded-2xl p-4 w-full container-fixed space-y-4 text-[15px] leading-tight">
 
     <!-- 表頭 -->
     <div class="three-col-grid font-semibold text-gray-700">
@@ -93,77 +115,64 @@
 
     <!-- 追加傷害（在套裝效果上方） -->
     <div class="three-col-grid">
-      <div class="row">
-        <label class="text-sm">追加傷害</label>
-        <!-- A -->
-        <div>
-          <select id="A_addDmgType" class="border rounded p-2 w-full">
-            <option value="none">無追加傷害</option>
-            <option value="asparta">艾絲芭塔－神的審判</option>
-          </select>
-          <!-- A：展開的三欄 -->
-          <div id="A_addDmgInputs" class="hidden mt-2">
-            <div class="three-col-grid mt-2">
-              <div class="row">
-                <label class="text-sm">敵方生命力</label>
-                <div><input id="A_enemyHp" type="number" class="border rounded p-1.5 w-full text-right"></div>
-                <div></div>
-              </div>
-              <div class="row">
-                <label class="text-sm">傷害為生命力的</label>
-                <div class="relative">
-                  <input id="A_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-                </div>
-                <div></div>
-              </div>
-              <div class="row">
-                <label class="text-sm">傷害限制為攻擊力的</label>
-                <div class="relative">
-                  <input id="A_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-                </div>
-                <div></div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <label class="text-sm">追加傷害</label>
 
-        <!-- B -->
-        <div>
-          <select id="B_addDmgType" class="border rounded p-2 w-full">
-            <option value="none">無追加傷害</option>
-            <option value="asparta">艾絲芭塔－神的審判</option>
-          </select>
-          <!-- B：展開的三欄 -->
-          <div id="B_addDmgInputs" class="hidden mt-2">
-            <div class="three-col-grid mt-2">
-              <div class="row">
-                <label class="text-sm">敵方生命力</label>
-                <div><input id="B_enemyHp" type="number" class="border rounded p-1.5 w-full text-right"></div>
-                <div></div>
-              </div>
-              <div class="row">
-                <label class="text-sm">傷害為生命力的</label>
-                <div class="relative">
-                  <input id="B_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-                </div>
-                <div></div>
-              </div>
-              <div class="row">
-                <label class="text-sm">傷害限制為攻擊力的</label>
-                <div class="relative">
-                  <input id="B_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-                </div>
-                <div></div>
-              </div>
+      <!-- 裝備A -->
+      <div>
+        <select id="A_addDmgType" class="border rounded p-2 w-full">
+          <option value="none">無追加傷害</option>
+          <option value="asparta">艾絲芭塔－神的審判</option>
+        </select>
+        <div id="A_addDmgInputs" class="hidden mt-2">
+          <div class="adddmg-subrow">
+            <label class="text-sm">敵方生命力</label>
+            <input id="A_enemyHp" type="number" class="border rounded p-1.5 w-full text-right">
+          </div>
+          <div class="adddmg-subrow">
+            <label class="text-sm">傷害為敵方生命力的</label>
+            <div class="relative">
+              <input id="A_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+              <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+            </div>
+          </div>
+          <div class="adddmg-subrow">
+            <label class="text-sm">傷害限制為攻擊力的</label>
+            <div class="relative">
+              <input id="A_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+              <span class="absolute right-2 top-1.5 text-gray-400">%</span>
             </div>
           </div>
         </div>
-      </div> <!-- /row -->
-    </div> <!-- /three-col-grid -->
+      </div>
+
+      <!-- 裝備B -->
+      <div>
+        <select id="B_addDmgType" class="border rounded p-2 w-full">
+          <option value="none">無追加傷害</option>
+          <option value="asparta">艾絲芭塔－神的審判</option>
+        </select>
+        <div id="B_addDmgInputs" class="hidden mt-2">
+          <div class="adddmg-subrow">
+            <label class="text-sm">敵方生命力</label>
+            <input id="B_enemyHp" type="number" class="border rounded p-1.5 w-full text-right">
+          </div>
+          <div class="adddmg-subrow">
+            <label class="text-sm">傷害為敵方生命力的</label>
+            <div class="relative">
+              <input id="B_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+              <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+            </div>
+          </div>
+          <div class="adddmg-subrow">
+            <label class="text-sm">傷害限制為攻擊力的</label>
+            <div class="relative">
+              <input id="B_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+              <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 分隔線（套裝效果上方） -->
     <hr class="border-gray-300">
@@ -379,7 +388,7 @@
       refreshAddDmgUI();
     }
 
-    // 計算（主輸出；追加傷害僅計算顯示，不納入比較）
+    // 計算（主輸出；選擇艾絲芭塔時，四列顯示為「追加傷害版本」）
     function calc(prefix) {
       const v = (f) => parseFloat(get(prefix,f)?.value) || 0;
 
@@ -423,8 +432,8 @@
       // 防禦倍率（無條件捨去小數第4位），並作為「倍率」使用
       const DEF_CONST = 467;
       const defCalc = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal);
-      const rawDefRate =  Math.trunc ( ( defCalc / (DEF_CONST + defCalc ) * 10000 )) / 10000 ;
-      const defRate = ( 1 - rawDefRate ) * (1 - reduceRate) ;
+      const rawDefRate = Math.trunc((defCalc / (DEF_CONST + defCalc)) * 10000) / 10000;
+      const defRate = (1 - rawDefRate) * (1 - reduceRate);
 
       // 總攻
       const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
@@ -434,33 +443,33 @@
 
       const addType = get(prefix, 'addDmgType')?.value;
       if (addType === 'asparta') {
-      // 艾絲芭塔追加傷害基底
-      const enemyHp = v('enemyHp');
-      const hpPercent = v('hpPercent') / 100;
-      const limitAtkPercent = v('limitAtkPercent') / 100;
-      const espadaEnemyHP = enemyHp * hpPercent;
-      const espadaMaxATK  = atkTotal * limitAtkPercent;
-      const espadaCompare = espadaEnemyHP > espadaMaxATK ? espadaMaxATK : espadaEnemyHP;
+        // 艾絲芭塔追加傷害基底
+        const enemyHp = v('enemyHp');
+        const hpPercent = v('hpPercent') / 100;
+        const limitAtkPercent = v('limitAtkPercent') / 100;
+        const espadaEnemyHP = enemyHp * hpPercent;
+        const espadaMaxATK  = atkTotal * limitAtkPercent;
+        const espadaCompare = espadaEnemyHP > espadaMaxATK ? espadaMaxATK : espadaEnemyHP;
 
-      // 四種追加傷害版本
-      nono = ( atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
-            + ( espadaCompare * (1 + revengeDmgTotal + petDmgIncrese ) * defRate ) ;
-      dmgCritOnly = ( atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
-            + ( espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate ) ;
-      dmgWeakOnly = ( atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
-            + ( espadaCompare * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate ) ;
-      dmgBoth = ( atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
-            + ( espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate ) ;
+        // 四種追加傷害版本（你先前確認過的寫法）
+        nono = ( atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
+             + ( espadaCompare * (1 + revengeDmgTotal + petDmgIncrese ) * defRate );
+        dmgCritOnly = ( atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
+             + ( espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate );
+        dmgWeakOnly = ( atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
+             + ( espadaCompare * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate );
+        dmgBoth = ( atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
+             + ( espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate );
       } else {
-      // 原主輸出
-      nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+        // 原主輸出
+        nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+        dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+        dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+        dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       }
 
       return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth, defRate };
-      } 
+    }
 
     // 顯示結果
     function showResults(prefix, data) {
@@ -566,7 +575,6 @@
         $(`${p}_dmgCritOnly`).textContent='-';
         $(`${p}_dmgWeakOnly`).textContent='-';
         $(`${p}_dmgBoth`).textContent='-';
-        $(`${p}_espadaFinalValue`).textContent='-';
       });
       $('compareResult').textContent='請輸入完整數值';
       refreshAddDmgUI();
@@ -590,6 +598,3 @@
   </script>
 </body>
 </html>
-
-
-
