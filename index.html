@@ -453,6 +453,25 @@
     showResults('B', B);
     showDiff(A.dmgBoth, B.dmgBoth);
 
+  // 顯示或隱藏追加傷害輸入框
+  function bindAddDmgSelect() {
+    ['A','B'].forEach(prefix=>{
+    const sel = $(`${prefix}_addDmgType`);
+    const area = $(`${prefix}_addDmgInputs`);
+    sel.addEventListener('change', ()=>{
+      if (sel.value === 'asparta') {
+        area.classList.remove('hidden');
+      } else {
+        area.classList.add('hidden');
+      }
+      updateAll();
+    });
+  });
+}
+
+bindAddDmgSelect();
+
+
     // 顯示雙方防禦倍率
     if (!$('defRateDisplay')) {
       const hr = document.querySelector('hr.border-gray-300:last-of-type');
@@ -548,6 +567,7 @@
 
 </body>
 </html>
+
 
 
 
