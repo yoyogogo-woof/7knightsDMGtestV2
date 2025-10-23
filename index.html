@@ -106,23 +106,33 @@
     <hr class="border-gray-300">
 
     <!-- 追加傷害 -->
-    <div class="three-col-grid">
-      <div class="row">
-        <label class="text-sm">追加傷害</label>
-        <div>
-          <select id="A_addDMG" class="border rounded p-2 w-full">
-            <option value="none">無追加傷害</option>
-            <option value="espada2">艾絲芭塔－神的審判</option>
-          </select>
-        </div>
-        <div>
-          <select id="B_addDMG" class="border rounded p-2 w-full">
-            <option value="none">無追加傷害</option>
-            <option value="espada2">艾絲芭塔－神的審判</option>
-          </select>
+      <div class="three-col-grid">
+        <div class="row">
+          <label class="text-sm">追加傷害</label>
+          <div>
+            <select id="A_addDmgType" class="border rounded p-2 w-full">
+              <option value="none">無追加傷害</option>
+              <option value="asparta">艾絲芭塔－神的審判</option>
+            </select>
+            <div id="A_addDmgInputs" class="hidden mt-2 space-y-1">
+              <div><input id="A_enemyHp" type="number" class="border rounded p-1.5 w-full text-right" placeholder="敵方生命力"></div>
+              <div class="relative"><input id="A_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="傷害為生命力的"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+              <div class="relative"><input id="A_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="傷害限制為攻擊力的"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+            </div>
+          </div>
+          <div>
+            <select id="B_addDmgType" class="border rounded p-2 w-full">
+              <option value="none">無追加傷害</option>
+              <option value="asparta">艾絲芭塔－神的審判</option>
+            </select>
+            <div id="B_addDmgInputs" class="hidden mt-2 space-y-1">
+              <div><input id="B_enemyHp" type="number" class="border rounded p-1.5 w-full text-right" placeholder="敵方生命力"></div>
+              <div class="relative"><input id="B_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="傷害為生命力的"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+              <div class="relative"><input id="B_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6" placeholder="傷害限制為攻擊力的"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
     <!-- 分隔線（下拉選單上方） -->
     <hr class="border-gray-300">
@@ -538,6 +548,7 @@
 
 </body>
 </html>
+
 
 
 
