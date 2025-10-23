@@ -23,6 +23,18 @@
       gap: 4px;
       align-items: center;
     }
+    .adddmg-subrow {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr; /* 左側標籤 + 右側輸入欄 */
+  gap: 4px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.adddmg-subrow label {
+  text-align: left;
+  padding-left: 4px;
+}
     .row { display: contents; } /* 讓每個子元素自然落在三個欄 */
   </style>
 </head>
@@ -102,31 +114,26 @@
           </select>
           <!-- A：展開的三欄 -->
           <div id="A_addDmgInputs" class="hidden mt-2">
-            <div class="three-col-grid mt-2">
-              <div class="row">
-                <label class="text-sm">敵方生命力</label>
-                <div><input id="A_enemyHp" type="number" class="border rounded p-1.5 w-full text-right"></div>
-                <div></div>
-              </div>
-              <div class="row">
-                <label class="text-sm">傷害為生命力的</label>
-                <div class="relative">
-                  <input id="A_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-                </div>
-                <div></div>
-              </div>
-              <div class="row">
-                <label class="text-sm">傷害限制為攻擊力的</label>
-                <div class="relative">
-                  <input id="A_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-                </div>
-                <div></div>
-              </div>
-            </div>
-          </div>
-        </div>
+  <div class="adddmg-subrow">
+    <label class="text-sm">敵方生命力</label>
+    <input id="A_enemyHp" type="number" class="border rounded p-1.5 w-full text-right">
+  </div>
+  <div class="adddmg-subrow">
+    <label class="text-sm">傷害為敵方生命力的</label>
+    <div class="relative">
+      <input id="A_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+      <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+    </div>
+  </div>
+  <div class="adddmg-subrow">
+    <label class="text-sm">傷害限制為攻擊力的</label>
+    <div class="relative">
+      <input id="A_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+      <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+    </div>
+  </div>
+</div>
+
 
         <!-- B -->
         <div>
@@ -135,32 +142,27 @@
             <option value="asparta">艾絲芭塔－神的審判</option>
           </select>
           <!-- B：展開的三欄 -->
-          <div id="B_addDmgInputs" class="hidden mt-2">
-            <div class="three-col-grid mt-2">
-              <div class="row">
-                <label class="text-sm">敵方生命力</label>
-                <div><input id="B_enemyHp" type="number" class="border rounded p-1.5 w-full text-right"></div>
-                <div></div>
-              </div>
-              <div class="row">
-                <label class="text-sm">傷害為生命力的</label>
-                <div class="relative">
-                  <input id="B_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-                </div>
-                <div></div>
-              </div>
-              <div class="row">
-                <label class="text-sm">傷害限制為攻擊力的</label>
-                <div class="relative">
-                  <input id="B_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-                </div>
-                <div></div>
-              </div>
-            </div>
-          </div>
-        </div>
+          <div id="A_addDmgInputs" class="hidden mt-2">
+  <div class="adddmg-subrow">
+    <label class="text-sm">敵方生命力</label>
+    <input id="A_enemyHp" type="number" class="border rounded p-1.5 w-full text-right">
+  </div>
+  <div class="adddmg-subrow">
+    <label class="text-sm">傷害為生命力的</label>
+    <div class="relative">
+      <input id="A_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+      <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+    </div>
+  </div>
+  <div class="adddmg-subrow">
+    <label class="text-sm">傷害限制為攻擊力的</label>
+    <div class="relative">
+      <input id="A_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+      <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+    </div>
+  </div>
+</div>
+
       </div> <!-- /row -->
     </div> <!-- /three-col-grid -->
 
@@ -589,5 +591,6 @@
   </script>
 </body>
 </html>
+
 
 
