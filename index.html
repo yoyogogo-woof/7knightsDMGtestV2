@@ -314,6 +314,11 @@
             <td class="p-2 border-b text-right text-blue-600 font-semibold" id="A_dmgBoth">-</td>
             <td class="p-2 border-b text-right text-blue-600 font-semibold" id="B_dmgBoth">-</td>
           </tr>
+            <tr>
+            <td class="p-2 border-b">追加傷害</td>
+            <td class="p-2 border-b text-right" id="A_espadaFinalValue">-</td>
+            <td class="p-2 border-b text-right" id="B_espadaFinalValue">-</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -332,7 +337,7 @@
       'addDmgType','enemyHp','hpPercent','limitAtkPercent',
       'setEffect','buffAtk','weakDmg','revengeDmg','buffCritDMG',
       'deffDown','deffIgnore','petAtkFlat','petAtkPercent','petSkillAtk',
-      'petCritDmg','petDmgIncrese','enemyDef','reduceRate','enemyDefIncrease'
+      'petCritDmg','petDmgIncrese','enemyDef','reduceRate','enemyDefIncrease','enemyHp','hpPercent','limitAtkPercent'
     ];
 
     // 工具函式
@@ -419,10 +424,10 @@
         case 'assassin4': deffIgnoreTotal += 0.15; break;
       }
 
-      const DEF_CONST = 467;
-      const defCalc = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal);
-      const rawDefRate = (1 - (defCalc / (DEF_CONST + defCalc))) * (1 - reduceRate);
-      const defRate = Math.trunc(rawDefRate * 10000) / 10000; // 無條件捨去 4 位
+       const DEF_CONST = 467;
+       const defCalc = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal);
+     　const rawDefRate = Math.trunc ( ( defCalc / (DEF_CONST + defCalc) ) * 10000 ) / 10000 ;
+       const defRate = (1 - rawDefRate) * (1 - reduceRate) ;
 
       const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
 
@@ -430,6 +435,17 @@
       const dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       const dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDMG + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
       const nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+
+      //追加傷害：艾絲芭塔－神的審判
+      const enemyHp = v('enemyHp');
+      const enemyHp = v('hpPercent')/100;
+      const enemyHp = v('limitAtkPercent')/100;
+      
+      const espadaEnemyHP = enemyHp * hpPercent ;
+      const espadaMaxATK = atkTotal * limitAtkPercent ;
+      const espadaCompaare = espadaEnemyHP > espadaMaxATK ? espadaMaxATK : espadaEnemyHP;
+
+      const espadaFinalValue = espadaCompaare * (1 + (critDmg + petCritDMG + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
 
       // 回傳（保留擴充空間：之後可把追加傷害算進來）
       return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth, defRate };
@@ -442,6 +458,8 @@
       $(`${prefix}_dmgCritOnly`).textContent = fmt(data.dmgCritOnly);
       $(`${prefix}_dmgWeakOnly`).textContent = fmt(data.dmgWeakOnly);
       $(`${prefix}_dmgBoth`).textContent = fmt(data.dmgBoth);
+
+       $(`${prefix}_espadaFinalValue`).textContent = fmt(data.espadaFinalValue);
     }
 
     // 差異顯示
@@ -566,3 +584,4 @@
   </script>
 </body>
 </html>
+
