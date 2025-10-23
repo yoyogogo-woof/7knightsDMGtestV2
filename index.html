@@ -1,38 +1,30 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>774傷害計算機</title>
+  <title>774傷害計算機（完整版）</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* 你原本的樣式都保留 */
+    /* B 欄自動同步時顯示鎖頭 */
     .lock-icon::after {
       content: "🔒";
-      ...
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      font-size: 13px;
+      opacity: 0.75;
+      pointer-events: none;
     }
-
+    /* 三欄結構（手機也維持三欄） */
     .three-col-grid {
-      ...
-    }
-
-    /* ✅ 把這段放這裡 */
-    .adddmg-subrow {
       display: grid;
-      grid-template-columns: 1fr 0.8fr;
+      grid-template-columns: 1fr 0.8fr 0.8fr;
       gap: 4px;
       align-items: center;
-      margin-top: 4px;
     }
-
-    .adddmg-subrow label {
-      text-align: left;
-      padding-left: 4px;
-    }
-
-    .row {
-      display: contents;
-    }
+    .row { display: contents; } /* 讓每個子元素自然落在三個欄 */
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center py-8">
@@ -97,68 +89,81 @@
     </div>
 
     <!-- 分隔線（追加傷害上方） -->
-<hr class="border-gray-300">
+    <hr class="border-gray-300">
 
-<!-- 追加傷害（在套裝效果上方） -->
-<div class="three-col-grid">
-  <label class="text-sm">追加傷害</label>
+    <!-- 追加傷害（在套裝效果上方） -->
+    <div class="three-col-grid">
+      <div class="row">
+        <label class="text-sm">追加傷害</label>
+        <!-- A -->
+        <div>
+          <select id="A_addDmgType" class="border rounded p-2 w-full">
+            <option value="none">無追加傷害</option>
+            <option value="asparta">艾絲芭塔－神的審判</option>
+          </select>
+          <!-- A：展開的三欄 -->
+          <div id="A_addDmgInputs" class="hidden mt-2">
+            <div class="three-col-grid mt-2">
+              <div class="row">
+                <label class="text-sm">敵方生命力</label>
+                <div><input id="A_enemyHp" type="number" class="border rounded p-1.5 w-full text-right"></div>
+                <div></div>
+              </div>
+              <div class="row">
+                <label class="text-sm">傷害為生命力的</label>
+                <div class="relative">
+                  <input id="A_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+                </div>
+                <div></div>
+              </div>
+              <div class="row">
+                <label class="text-sm">傷害限制為攻擊力的</label>
+                <div class="relative">
+                  <input id="A_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+                </div>
+                <div></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-  <!-- 裝備A -->
-  <div>
-    <select id="A_addDmgType" class="border rounded p-2 w-full">
-      <option value="none">無追加傷害</option>
-      <option value="asparta">艾絲芭塔－神的審判</option>
-    </select>
-    <div id="A_addDmgInputs" class="hidden mt-2">
-      <div class="adddmg-subrow">
-        <label class="text-sm">敵方生命力</label>
-        <input id="A_enemyHp" type="number" class="border rounded p-1.5 w-full text-right">
-      </div>
-      <div class="adddmg-subrow">
-        <label class="text-sm">傷害為敵方生命力的</label>
-        <div class="relative">
-          <input id="A_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-          <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+        <!-- B -->
+        <div>
+          <select id="B_addDmgType" class="border rounded p-2 w-full">
+            <option value="none">無追加傷害</option>
+            <option value="asparta">艾絲芭塔－神的審判</option>
+          </select>
+          <!-- B：展開的三欄 -->
+          <div id="B_addDmgInputs" class="hidden mt-2">
+            <div class="three-col-grid mt-2">
+              <div class="row">
+                <label class="text-sm">敵方生命力</label>
+                <div><input id="B_enemyHp" type="number" class="border rounded p-1.5 w-full text-right"></div>
+                <div></div>
+              </div>
+              <div class="row">
+                <label class="text-sm">傷害為生命力的</label>
+                <div class="relative">
+                  <input id="B_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+                </div>
+                <div></div>
+              </div>
+              <div class="row">
+                <label class="text-sm">傷害限制為攻擊力的</label>
+                <div class="relative">
+                  <input id="B_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+                  <span class="absolute right-2 top-1.5 text-gray-400">%</span>
+                </div>
+                <div></div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="adddmg-subrow">
-        <label class="text-sm">傷害限制為攻擊力的</label>
-        <div class="relative">
-          <input id="A_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-          <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 裝備B -->
-  <div>
-    <select id="B_addDmgType" class="border rounded p-2 w-full">
-      <option value="none">無追加傷害</option>
-      <option value="asparta">艾絲芭塔－神的審判</option>
-    </select>
-    <div id="B_addDmgInputs" class="hidden mt-2">
-      <div class="adddmg-subrow">
-        <label class="text-sm">敵方生命力</label>
-        <input id="B_enemyHp" type="number" class="border rounded p-1.5 w-full text-right">
-      </div>
-      <div class="adddmg-subrow">
-        <label class="text-sm">傷害為敵方生命力的</label>
-        <div class="relative">
-          <input id="B_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-          <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-        </div>
-      </div>
-      <div class="adddmg-subrow">
-        <label class="text-sm">傷害限制為攻擊力的</label>
-        <div class="relative">
-          <input id="B_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-          <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+      </div> <!-- /row -->
+    </div> <!-- /three-col-grid -->
 
     <!-- 分隔線（套裝效果上方） -->
     <hr class="border-gray-300">
@@ -585,8 +590,6 @@
   </script>
 </body>
 </html>
-
-
 
 
 
