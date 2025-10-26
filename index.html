@@ -238,6 +238,11 @@
         <div class="relative"><input id="A_deffIgnore" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
         <div class="relative"><input id="B_deffIgnore" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
       </div>
+      <div class="row">
+        <label class="text-sm">物理/魔法脆弱</label>
+        <div class="relative"><input id="A_enemyWeek" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+        <div class="relative"><input id="B_enemyWeek" type="number" class="border rounded p-1.5 w-full text-right pr-6"><span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+      </div>
     </div>
 
     <!-- 寵物效果 -->
@@ -342,7 +347,7 @@
       'addDmgType','enemyHp','hpPercent','limitAtkPercent',
       'setEffect','buffAtk','weakDmg','revengeDmg','buffCritDMG',
       'deffDown','deffIgnore','petAtkFlat','petAtkPercent','petSkillAtk',
-      'petCritDmg','petDmgIncrese','enemyDef','reduceRate','enemyDefIncrease'
+      'petCritDmg','petDmgIncrese','enemyDef','reduceRate','enemyDefIncrease' , 'enemyWeak'
     ];
 
     // 工具函式
@@ -414,7 +419,8 @@
       const enemyDef = v('enemyDef');
       const reduceRate = v('reduceRate')/100;
       const enemyDefIncrease = v('enemyDefIncrease')/100;
-
+      const enemyWeak = v('enemyWeak')/100;
+      
       const setEffect = get(prefix,'setEffect')?.value || 'none';
 
       let weakDmgTotal = weakDmg;
@@ -433,7 +439,7 @@
       const DEF_CONST = 467;
       const defCalc = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal);
       const rawDefRate = Math.trunc((defCalc / (DEF_CONST + defCalc)) * 10000) / 10000;
-      const defRate = (1 - rawDefRate) * (1 - reduceRate);
+      const defRate = (1 - rawDefRate) * (1 - reduceRate + enemyWeak );
 
       // 總攻
       const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
@@ -598,3 +604,4 @@
   </script>
 </body>
 </html>
+
