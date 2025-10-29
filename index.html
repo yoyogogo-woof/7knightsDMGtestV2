@@ -1,21 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>774傷害計算機（修正版）</title>
+  <title>774傷害計算機</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    /* B 欄自動同步時顯示鎖頭 */
-    .lock-icon::after {
-      content: "🔒";
-      position: absolute;
-      top: 4px;
-      right: 6px;
-      font-size: 13px;
-      opacity: 0.75;
-      pointer-events: none;
-    }
+  
     /* 三欄結構（手機也維持三欄） */
     .three-col-grid {
       display: grid;
@@ -48,7 +41,9 @@
       padding-right: .25rem;
     }
   </style>
+
 </head>
+
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center py-8">
 
   <h1 class="text-3xl font-bold mb-6">774傷害計算機</h1>
@@ -115,64 +110,177 @@
 
     <!-- 追加傷害（在套裝效果上方） -->
     <div class="three-col-grid">
-      <label class="text-sm">追加傷害</label>
+      <label class="text-sm">特殊技能</label>
 
       <!-- 裝備A -->
       <div>
         <select id="A_addDmgType" class="border rounded p-2 w-full">
           <option value="none">無追加傷害</option>
-          <option value="asparta">艾絲芭塔－神的審判</option>
+          <option value="espada">艾絲芭塔－神的審判</option>
+	  <option value="kyle">凱爾－鎖鏈暴壓</option>
         </select>
-        <div id="A_addDmgInputs" class="hidden mt-2">
-          <div class="adddmg-subrow">
-            <label class="text-sm">敵方生命力</label>
-            <input id="A_enemyHp" type="number" class="border rounded p-1.5 w-full text-right">
+	<div id="A_addDmgInputs_espada" class="hidden mt-2">
+ 	 <div class="adddmg-subrow">
+ 	   <label class="text-sm">是否強化此技能</label>
+ 	   <input id="A_espadaEnhanced" type="checkbox" class="scale-125">
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+ 	   <label class="text-sm">是否強化被動技能</label>
+ 	   <input id="A_espadaEnhanced3" type="checkbox" class="scale-125">
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+ 	   <label class="text-sm">是否已六突</label>
+ 	   <input id="A_espadaEnhanced2" type="checkbox" class="scale-125">
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+  	  <label class="text-sm">招式倍率</label>
+	  <div class="relative">
+  	  <input id="A_espadaSkillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	  <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+  	  <label class="text-sm">四層被動傷害量增加</label>
+	  <div class="relative">
+  	  <input id="A_espadaDMGincrease" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	  <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+  	   <label class="text-sm">傷害為敵方生命力的</label>
+	   <div class="relative">
+   	   <input id="A_espadaHpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+  	 </div>
+  	 <div class="adddmg-subrow">
+  	   <label class="text-sm">傷害限制為攻擊力的</label>
+	   <div class="relative">
+  	   <input id="A_espadaDMGlimit" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
           </div>
-          <div class="adddmg-subrow">
-            <label class="text-sm">傷害為敵方生命力的</label>
-            <div class="relative">
-              <input id="A_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-              <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-            </div>
-          </div>
-          <div class="adddmg-subrow">
-            <label class="text-sm">傷害限制為攻擊力的</label>
-            <div class="relative">
-              <input id="A_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-              <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-            </div>
-          </div>
+ 	 <div class="adddmg-subrow">
+	   <label class="text-sm">敵方生命力</label>
+ 	   <input id="A_espadaEnemyHp" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+  	 </div>
+        </div>
+	<div id="A_addDmgInputs_kyle" class="hidden mt-2">
+ 	 <div class="adddmg-subrow">
+  	  <label class="text-sm">是否強化此技能</label>
+  	  <input id="A_kyleEnhanced" type="checkbox" class="scale-125">
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+ 	   <label class="text-sm">招式倍率</label>
+	   <div class="relative">
+  	   <input id="A_kyleSkillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+         </div>
+ 	 <div class="adddmg-subrow">
+  	   <label class="text-sm">傷害為敵方生命力的</label>
+	   <div class="relative">
+   	   <input id="A_kyleHpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+  	 </div>
+  	 <div class="adddmg-subrow">
+  	   <label class="text-sm">傷害限制為攻擊力的</label>
+	   <div class="relative">
+  	   <input id="A_kyleDMGlimit" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+         </div>
+  	 <div class="adddmg-subrow">
+  	   <label class="text-sm">敵方已損失生命</label>
+	   <div class="relative">
+  	   <input id="A_kyleEnemyLoseHp" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+         </div>
+ 	 <div class="adddmg-subrow">
+	   <label class="text-sm">敵方生命力</label>
+ 	   <input id="A_kyleEnemyHp" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+  	 </div>
         </div>
       </div>
-
       <!-- 裝備B -->
       <div>
         <select id="B_addDmgType" class="border rounded p-2 w-full">
           <option value="none">無追加傷害</option>
-          <option value="asparta">艾絲芭塔－神的審判</option>
+          <option value="espada">艾絲芭塔－神的審判</option>
+	  <option value="kyle">凱爾－鎖鏈暴壓</option>
         </select>
-        <div id="B_addDmgInputs" class="hidden mt-2">
-          <div class="adddmg-subrow">
-            <label class="text-sm">敵方生命力</label>
-            <input id="B_enemyHp" type="number" class="border rounded p-1.5 w-full text-right">
+	<div id="B_addDmgInputs_espada" class="hidden mt-2">
+ 	 <div class="adddmg-subrow">
+ 	   <label class="text-sm">是否強化此技能</label>
+ 	   <input id="B_espadaEnhanced" type="checkbox" class="scale-125">
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+ 	   <label class="text-sm">是否強化被動技能</label>
+ 	   <input id="B_espadaEnhanced3" type="checkbox" class="scale-125">
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+ 	   <label class="text-sm">是否已六突</label>
+ 	   <input id="B_espadaEnhanced2" type="checkbox" class="scale-125">
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+  	   <label class="text-sm">招式倍率</label>
+	   <div class="relative">
+  	   <input id="B_espadaSkillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+  	  <label class="text-sm">四層被動傷害量增加</label>
+	  <div class="relative">
+  	  <input id="B_espadaDMGincrease" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	  <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+  	   <label class="text-sm">傷害為敵方生命力的</label>
+	   <div class="relative">
+   	   <input id="B_espadaHpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+  	 </div>
+  	 <div class="adddmg-subrow">
+  	   <label class="text-sm">傷害限制為攻擊力的</label>
+	   <div class="relative">
+  	   <input id="B_espadaDMGlimit" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+         </div>
+ 	 <div class="adddmg-subrow">
+	   <label class="text-sm">敵方生命力</label>
+ 	   <input id="B_espadaEnemyHp" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+  	 </div>
+        </div>
+	<div id="B_addDmgInputs_kyle" class="hidden mt-2">
+ 	 <div class="adddmg-subrow">
+  	  <label class="text-sm">是否強化此技能</label>
+  	  <input id="B_kyleEnhanced" type="checkbox" class="scale-125">
+ 	 </div>
+ 	 <div class="adddmg-subrow">
+ 	   <label class="text-sm">招式倍率</label>
+	   <div class="relative">
+  	   <input id="B_kyleSkillRate" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
           </div>
-          <div class="adddmg-subrow">
-            <label class="text-sm">傷害為敵方生命力的</label>
-            <div class="relative">
-              <input id="B_hpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-              <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-            </div>
-          </div>
-          <div class="adddmg-subrow">
-            <label class="text-sm">傷害限制為攻擊力的</label>
-            <div class="relative">
-              <input id="B_limitAtkPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
-              <span class="absolute right-2 top-1.5 text-gray-400">%</span>
-            </div>
-          </div>
+ 	 <div class="adddmg-subrow">
+  	   <label class="text-sm">傷害為敵方生命力的</label>
+	   <div class="relative">
+   	   <input id="B_kyleHpPercent" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+  	 </div>
+  	 <div class="adddmg-subrow">
+  	   <label class="text-sm">傷害限制為攻擊力的</label>
+	   <div class="relative">
+  	   <input id="B_kyleDMGlimit" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+         </div>
+  	 <div class="adddmg-subrow">
+  	   <label class="text-sm">敵方已損失生命</label>
+	   <div class="relative">
+  	   <input id="B_kyleEnemyLoseHp" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+	   <span class="absolute right-2 top-1.5 text-gray-400">%</span></div>
+         </div>
+ 	 <div class="adddmg-subrow">
+	   <label class="text-sm">敵方生命力</label>
+ 	   <input id="B_kyleEnemyHp" type="number" class="border rounded p-1.5 w-full text-right pr-6">
+  	 </div>
         </div>
       </div>
-    </div>
+  </div>
 
     <!-- 分隔線（套裝效果上方） -->
     <hr class="border-gray-300">
@@ -340,268 +448,345 @@
     </div>
   </div>
 
-  <script>
-    // 欄位清單（包含追加傷害欄位：可儲存/同步）
-    const fieldList = [
-      'atkPanel','atkBase','skillRate','critDmg','formAtk',
-      'addDmgType','enemyHp','hpPercent','limitAtkPercent',
-      'setEffect','buffAtk','weakDmg','revengeDmg','buffCritDMG',
-      'deffDown','deffIgnore','petAtkFlat','petAtkPercent','petSkillAtk',
-      'petCritDmg','petDmgIncrese','enemyDef','reduceRate','enemyDefIncrease' , 'enemyWeak'
-    ];
+<script>
+  // === 工具函式 ===
+  const $ = (id) => document.getElementById(id);
+  const get = (p, f) => $(`${p}_${f}`);
+  const saveLS = (p, f, val) => localStorage.setItem(`${p}_${f}`, val ?? '');
+  const loadLS = (p, f) => localStorage.getItem(`${p}_${f}`);
 
-    // 工具函式
-    const $ = (id) => document.getElementById(id);
-    const get = (p, f) => $(`${p}_${f}`);
-    const saveLS = (p, f, val) => localStorage.setItem(`${p}_${f}`, val ?? '');
-    const loadLS = (p, f) => localStorage.getItem(`${p}_${f}`);
+  // === 欄位清單 ===
+  const fieldList = [
+    'atkPanel','atkBase','skillRate','critDmg','formAtk',
+    'addDmgType','setEffect','buffAtk','weakDmg','revengeDmg','buffCritDMG',
+    'deffDown','deffIgnore','petAtkFlat','petAtkPercent','petSkillAtk',
+    'petCritDmg','petDmgIncrese','enemyDef','reduceRate','enemyDefIncrease','enemyWeak',
+    'espadaEnhanced','espadaEnhanced2','espadaEnhanced3','espadaEnemyHp','espadaSkillRate','espadaHpPercent','espadaDMGlimit','espadaDMGincrease',
+    'kyleEnhanced','kyleEnemyHp','kyleSkillRate','kyleHpPercent','kyleDMGlimit','kyleEnemyLoseHp'
+  ];
 
-    // 追加傷害顯示/隱藏
-    function toggleAddDmgVisibility(prefix) {
-      const sel = get(prefix,'addDmgType');
-      const area = $(`${prefix}_addDmgInputs`);
-      if (!sel || !area) return;
-      if (sel.value === 'asparta') area.classList.remove('hidden');
-      else area.classList.add('hidden');
-    }
-    function refreshAddDmgUI() {
-      ['A','B'].forEach(toggleAddDmgVisibility);
-    }
-
-    // 載入儲存值
-    function loadAll() {
-      ['A','B'].forEach(p=>{
-        fieldList.forEach(f=>{
-          const node = get(p,f);
-          if (!node) return;
-          const v = loadLS(p,f);
-          if (v !== null) node.value = v;
-        });
-      });
-      // 初始化 B 欄 userEdited 狀態
-      fieldList.forEach(f=>{
-        const b = get('B',f);
-        if (!b) return;
-        const v = b.value;
-        if (v && v !== '') {
-          b.dataset.userEdited = 'true';
-          b.classList.remove('bg-gray-200','lock-icon');
-        } else {
-          b.dataset.userEdited = 'false';
+  // === 載入所有 localStorage ===
+  function loadAll() {
+    ['A','B'].forEach(prefix => {
+      fieldList.forEach(f => {
+        const el = get(prefix, f);
+        const val = loadLS(prefix, f);
+        if (el && val !== null) {
+          if (el.type === 'checkbox') el.checked = val === 'true';
+          else el.value = val;
         }
-      });
-      refreshAddDmgUI();
-    }
-
-    // 計算（主輸出；選擇艾絲芭塔時，四列顯示為「追加傷害版本」）
-    function calc(prefix) {
-      const v = (f) => parseFloat(get(prefix,f)?.value) || 0;
-
-      const atkPanel = v('atkPanel');
-      const atkBase = v('atkBase');
-      const formAtk = v('formAtk')/100;
-      const skillRate = v('skillRate')/100;
-      const critDmg = v('critDmg')/100;
-
-      const buffAtk = v('buffAtk')/100;
-      const weakDmg = (v('weakDmg')+30)/100;
-      const revengeDmg = v('revengeDmg')/100;
-      const buffCritDMG = v('buffCritDMG')/100;
-      const deffDown = v('deffDown')/100;
-      const deffIgnore = v('deffIgnore')/100;
-
-      const petAtkFlat = v('petAtkFlat');
-      const petSkillAtk = v('petSkillAtk')/100;
-      const petCritDmg = v('petCritDmg')/100;
-      const petAtkPercent = v('petAtkPercent')/100;
-      const petDmgIncrese = v('petDmgIncrese')/100;
-
-      const enemyDef = v('enemyDef');
-      const reduceRate = v('reduceRate')/100;
-      const enemyDefIncrease = v('enemyDefIncrease')/100;
-      const enemyWeak = v('enemyWeak')/100;
-      
-      const setEffect = get(prefix,'setEffect')?.value || 'none';
-
-      let weakDmgTotal = weakDmg;
-      let revengeDmgTotal = revengeDmg;
-      let deffIgnoreTotal = deffIgnore;
-
-      switch (setEffect) {
-        case 'tracker4': weakDmgTotal += 0.35; break;
-        case 'avenger2': revengeDmgTotal += 0.15; break;
-        case 'avenger4': revengeDmgTotal += 0.30; break;
-        case 'avenger4Boss': revengeDmgTotal += 0.70; break;
-        case 'assassin4': deffIgnoreTotal += 0.15; break;
-      }
-
-      // 防禦倍率（無條件捨去小數第4位），並作為「倍率」使用
-      const DEF_CONST = 467;
-      const defCalc = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal);
-      const rawDefRate = Math.trunc((defCalc / (DEF_CONST + defCalc)) * 10000) / 10000;
-      const defRate = (1 - rawDefRate) * (1 - reduceRate + enemyWeak );
-
-      // 總攻
-      const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
-
-      // 主輸出
-      let dmgCritOnly, dmgWeakOnly, dmgBoth, nono;
-
-      const addType = get(prefix, 'addDmgType')?.value;
-      if (addType === 'asparta') {
-        // 艾絲芭塔追加傷害基底
-        const enemyHp = v('enemyHp');
-        const hpPercent = v('hpPercent') / 100;
-        const limitAtkPercent = v('limitAtkPercent') / 100;
-        const espadaEnemyHP = enemyHp * hpPercent;
-        const espadaMaxATK  = atkTotal * limitAtkPercent;
-        const espadaCompare = espadaEnemyHP > espadaMaxATK ? espadaMaxATK : espadaEnemyHP;
-
-        // 四種追加傷害版本（你先前確認過的寫法）
-        nono = ( atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
-             + ( espadaCompare * (1 + revengeDmgTotal + petDmgIncrese ) * defRate );
-        dmgCritOnly = ( atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
-             + ( espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate );
-        dmgWeakOnly = ( atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
-             + ( espadaCompare * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate );
-        dmgBoth = ( atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese - 0.32 ) * defRate )
-             + ( espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate );
-      } else {
-        // 原主輸出
-        nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-        dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-        dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-        dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
-      }
-
-      return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth, defRate };
-    }
-
-    // 顯示結果
-    function showResults(prefix, data) {
-      const fmt = (x) => !x || x<=0 ? '-' : Math.round(x).toLocaleString();
-      $(`${prefix}_nono`).textContent        = fmt(data.nono);
-      $(`${prefix}_dmgCritOnly`).textContent = fmt(data.dmgCritOnly);
-      $(`${prefix}_dmgWeakOnly`).textContent = fmt(data.dmgWeakOnly);
-      $(`${prefix}_dmgBoth`).textContent     = fmt(data.dmgBoth);
-    }
-
-    // 差異顯示（僅使用主輸出「暴擊＋弱點」來比較）
-    function showDiff(a, b) {
-      const box = $('compareResult');
-      if (!a || !b || a<=0 || b<=0) { box.textContent = '請輸入完整數值'; return; }
-      const diff = (b - a) / a * 100;
-      const sign = diff >= 0 ? '多' : '少';
-      const color = diff >= 0 ? 'text-green-600' : 'text-red-600';
-      box.innerHTML = `B 比 A <span class="${color} font-bold">${sign}${Math.abs(diff).toFixed(2)}%</span>`;
-    }
-
-    // 同步（A -> B）僅空白或未被手動編輯過的欄位
-    function syncField(field) {
-      const a = get('A', field);
-      const b = get('B', field);
-      if (!a || !b) return;
-      if (b.dataset.userEdited === 'true' && b.value !== '') return;
-
-      b.value = a.value;
-      b.dataset.autoSynced = 'true';
-      b.classList.add('bg-gray-200','lock-icon');
-      b.dataset.userEdited = 'false';
-      saveLS('B', field, b.value);
-
-      // 若同步的是追加傷害下拉：立刻切換 B 的顯示/隱藏
-      if (field === 'addDmgType') toggleAddDmgVisibility('B');
-    }
-
-    function syncAll() { fieldList.forEach(syncField); }
-
-    // 更新畫面
-    function updateAll() {
-      syncAll(); // 先同步（對於 B 空值與灰底）
-      const A = calc('A');
-      const B = calc('B');
-      showResults('A', A);
-      showResults('B', B);
-      showDiff(A.dmgBoth, B.dmgBoth);
-      refreshAddDmgUI(); // 確保追加傷害顯示狀態
-    }
-
-    // 輸入事件
-    function onInput(e) {
-      const node = e.target;
-      const id = node.id; // e.g. A_atkPanel / B_addDmgType
-      const [prefix, field] = id.split('_');
-
-      saveLS(prefix, field, node.value);
-
-      if (prefix === 'A') {
-        syncField(field);
-      } else if (prefix === 'B') {
-        if (node.value !== '') {
-          node.dataset.userEdited = 'true';
-          node.classList.remove('bg-gray-200','lock-icon');
-          delete node.dataset.autoSynced;
-        } else {
-          node.dataset.userEdited = 'false';
-          syncField(field);
-        }
-      }
-
-      // 如果是追加傷害下拉，切換顯示
-      if (field === 'addDmgType') toggleAddDmgVisibility(prefix);
-
-      updateAll();
-    }
-
-    // 綁定 input / select
-    function bindAll() {
-      fieldList.forEach(f=>{
-        const a = get('A',f), b = get('B',f);
-        if (a) { a.addEventListener('input', onInput); a.addEventListener('change', onInput); }
-        if (b) { b.addEventListener('input', onInput); b.addEventListener('change', onInput); }
-      });
-    }
-
-    // 重設
-    function resetAll() {
-      if (!confirm('確定要清除所有數值嗎？')) return;
-      fieldList.forEach(f=>{
-        localStorage.removeItem(`A_${f}`);
-        localStorage.removeItem(`B_${f}`);
-        const a = get('A',f), b = get('B',f);
-        if (a) a.value = '';
-        if (b) {
-          b.value = '';
-          b.dataset.userEdited = 'false';
-          b.classList.remove('bg-gray-200','lock-icon');
-        }
-      });
-      ['A','B'].forEach(p=>{
-        $(`${p}_nono`).textContent='-';
-        $(`${p}_dmgCritOnly`).textContent='-';
-        $(`${p}_dmgWeakOnly`).textContent='-';
-        $(`${p}_dmgBoth`).textContent='-';
-      });
-      $('compareResult').textContent='請輸入完整數值';
-      refreshAddDmgUI();
-    }
-
-    // 初始化
-    loadAll();
-    bindAll();
-    syncAll();
-    updateAll();
-    $('resetBtn').addEventListener('click', resetAll);
-
-    // 卸載前保存
-    window.addEventListener('beforeunload', ()=>{
-      fieldList.forEach(f=>{
-        const a = get('A',f), b = get('B',f);
-        if (a) saveLS('A',f,a.value);
-        if (b) saveLS('B',f,b.value);
       });
     });
-  </script>
+    ['A','B'].forEach(toggleAddDmgVisibility);
+  }
+
+  // === 預設數值 ===========================
+
+  // === 技能倍率 ===
+  function setupSkillDefaults(prefix) {
+    // 凱爾：倍率 50 → 強化後 65
+    const kyleEnhanced = document.getElementById(prefix + '_kyleEnhanced');
+    const kyleSkillRate = document.getElementById(prefix + '_kyleSkillRate');
+    if (kyleEnhanced && kyleSkillRate) {
+      kyleSkillRate.value = kyleEnhanced.checked ? 72 : 60;
+    }
+    const espadaEnhanced = document.getElementById(prefix + '_espadaEnhanced');
+    const espadaSkillRate = document.getElementById(prefix + '_espadaSkillRate');
+    if (espadaEnhanced && espadaSkillRate) {
+      espadaSkillRate.value = espadaEnhanced.checked ? 515 : 425;
+    }
+  }
+
+  // === 傷害為敵方生命力% ===
+  function setupHpPercentDefaults(prefix) {
+    // 凱爾：倍率 8 → 強化後 10
+    const kyleEnhanced = document.getElementById(prefix + '_kyleEnhanced');
+    const kyleHpPercent = document.getElementById(prefix + '_kyleHpPercent');
+    if (kyleEnhanced && kyleHpPercent) {
+      kyleHpPercent.value = kyleEnhanced.checked ? 10 : 8;
+    }
+    const espadaEnhanced2 = document.getElementById(prefix + '_espadaEnhanced2');
+    const espadaHpPercent = document.getElementById(prefix + '_espadaHpPercent');
+    if (espadaEnhanced2 && espadaHpPercent) {
+      espadaHpPercent.value = espadaEnhanced2.checked ? 32 : 26;
+    }
+  }
+
+  // === 傷害限制為攻擊力的% ===
+  function setupDMGlimitDefaults(prefix) {
+    // 凱爾：倍率 8 → 強化後 10
+    const kyleEnhanced = document.getElementById(prefix + '_kyleEnhanced');
+    const kyleDMGlimit = document.getElementById(prefix + '_kyleDMGlimit');
+    if (kyleEnhanced && kyleDMGlimit) {
+      kyleDMGlimit.value = kyleEnhanced.checked ? 75 : 75;
+    }
+    const espadaEnhanced2 = document.getElementById(prefix + '_espadaEnhanced2');
+    const espadaDMGlimit = document.getElementById(prefix + '_espadaDMGlimit');
+    const espadaDMGincrease = document.getElementById(prefix + '_espadaDMGincrease');
+    if (espadaEnhanced2 && espadaDMGlimit) {
+      espadaDMGlimit.value = espadaEnhanced2.checked ? 1600 : 1300;
+      espadaDMGincrease.value = espadaEnhanced2.checked ? 40 : 32;
+    }
+  }
+
+  // === 顯示/隱藏特殊技能區塊 ===
+  function toggleAddDmgVisibility(prefix) {
+    const sel = document.getElementById(prefix + '_addDmgType');
+    const espada = document.getElementById(prefix + '_addDmgInputs_espada');
+    const kyle = document.getElementById(prefix + '_addDmgInputs_kyle');
+    if (!sel) return;
+
+    if (espada) espada.classList.add('hidden');
+    if (kyle) kyle.classList.add('hidden');
+
+    if (sel.value === 'espada' && espada) espada.classList.remove('hidden');
+    if (sel.value === 'kyle' && kyle) kyle.classList.remove('hidden');
+
+    setupSkillDefaults(prefix);
+    setupHpPercentDefaults(prefix);
+    setupDMGlimitDefaults(prefix);
+  }
+
+  function refreshAddDmgUI() {
+    ['A','B'].forEach(toggleAddDmgVisibility);
+  }
+
+  // === 同步欄位 ===
+  function syncField(field) {
+    // 不要自動同步的欄位（艾絲芭塔/凱爾的強化與其衍生欄位）
+    const noSync = new Set([
+      'espadaEnhanced','espadaEnhanced2','espadaEnhanced3',
+      'kyleEnhanced',
+      'espadaSkillRate','espadaHpPercent','espadaDMGlimit','espadaEnemyHp',
+      'kyleSkillRate','kyleHpPercent','kyleDMGlimit','kyleEnemyHp'
+    ]);
+    if (noSync.has(field)) return;  // ← 直接跳過
+
+    const a = get('A', field);
+    const b = get('B', field);
+    if (!a || !b) return;
+    if (b.dataset.userEdited === 'true' && b.value !== '') return;
+
+    if (a.type === 'checkbox') b.checked = a.checked;
+    else b.value = a.value;
+
+    b.dataset.autoSynced = 'true';
+    b.classList.add('bg-gray-200','lock-icon');
+    b.dataset.userEdited = 'false';
+    saveLS('B', field, b.type === 'checkbox' ? b.checked : b.value);
+
+    if (field === 'addDmgType') toggleAddDmgVisibility('B');
+  }
+
+  function syncAll() { fieldList.forEach(syncField); }
+
+  // === 計算主函式 ===
+  function calc(prefix) {
+    const v = (f) => parseFloat(get(prefix,f)?.value) || 0;
+
+    const atkPanel = v('atkPanel');
+    const atkBase = v('atkBase');
+    const formAtk = v('formAtk')/100;
+    const skillRate = v('skillRate')/100;
+    const critDmg = v('critDmg')/100;
+
+    const buffAtk = v('buffAtk')/100;
+    const weakDmg = (v('weakDmg')+30)/100;
+    const revengeDmg = v('revengeDmg')/100;
+    const buffCritDMG = v('buffCritDMG')/100;
+    const deffDown = v('deffDown')/100;
+    const deffIgnore = v('deffIgnore')/100;
+
+    const petAtkFlat = v('petAtkFlat');
+    const petSkillAtk = v('petSkillAtk')/100;
+    const petCritDmg = v('petCritDmg')/100;
+    const petAtkPercent = v('petAtkPercent')/100;
+    const petDmgIncrese = v('petDmgIncrese')/100;
+
+    const enemyDef = v('enemyDef');
+    const reduceRate = v('reduceRate')/100;
+    const enemyDefIncrease = v('enemyDefIncrease')/100;
+    const enemyWeak = v('enemyWeak')/100;
+    
+    const setEffect = get(prefix,'setEffect')?.value || 'none';
+
+    let weakDmgTotal = weakDmg;
+    let revengeDmgTotal = revengeDmg;
+    let deffIgnoreTotal = deffIgnore;
+
+    switch (setEffect) {
+      case 'tracker4': weakDmgTotal += 0.35; break;
+      case 'avenger2': revengeDmgTotal += 0.15; break;
+      case 'avenger4': revengeDmgTotal += 0.30; break;
+      case 'avenger4Boss': revengeDmgTotal += 0.70; break;
+      case 'assassin4': deffIgnoreTotal += 0.15; break;
+    }
+
+    const DEF_CONST = 467;
+    const defCalc = enemyDef * (1 - deffDown + enemyDefIncrease) * (1 - deffIgnoreTotal);
+    const rawDefRate = Math.trunc((defCalc / (DEF_CONST + defCalc)) * 10000) / 10000;
+    const defRate = (1 - rawDefRate) * (1 - reduceRate + enemyWeak );
+    const atkTotal = (atkPanel + atkBase * (formAtk + petAtkPercent) + petAtkFlat) * (1 + buffAtk + petSkillAtk);
+
+    let dmgCritOnly, dmgWeakOnly, dmgBoth, nono;
+    const addType = get(prefix, 'addDmgType')?.value;
+
+    if (addType === 'espada') {
+      const espadaEnemyHp = v('espadaEnemyHp');
+      const espadaSkillRate = ((parseFloat( document.getElementById(prefix + '_espadaSkillRate').value ) || 0))/100;
+      const espadaHpPercent = v('espadaHpPercent') / 100;
+      const espadaDMGlimit = v('espadaDMGlimit') / 100;
+      const espadaEnemyHPcalc = espadaEnemyHp * espadaHpPercent;
+      const espadaMaxATK  = atkTotal * espadaDMGlimit;
+      const espadaCompare = Math.min(espadaEnemyHPcalc, espadaMaxATK);
+      const espd = document.getElementById(prefix + '_espadaEnhanced3').checked ? 0.4 : 0.32;
+      const espadaDMGincrease = v('espadaDMGincrease') / 100;
+
+      // 艾絲芭塔公式
+      nono = ( atkTotal * espadaSkillRate * (1 + revengeDmgTotal + petDmgIncrese ) * defRate )
+             + ( espadaCompare * (1 + revengeDmgTotal + espadaDMGincrease + petDmgIncrese ) * defRate );
+      dmgCritOnly = ( atkTotal * espadaSkillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese ) * defRate )
+             + ( espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + espadaDMGincrease + petDmgIncrese) * defRate );
+      dmgWeakOnly = ( atkTotal * espadaSkillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese ) * defRate )
+             + ( espadaCompare * (1 + weakDmgTotal) * (1 + revengeDmgTotal + espadaDMGincrease + petDmgIncrese) * defRate );
+      dmgBoth = ( atkTotal * espadaSkillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese ) * defRate )
+             + ( espadaCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + espadaDMGincrease + petDmgIncrese) * defRate );
+    }
+
+      //凱爾公式
+    else if (addType === 'kyle') {
+      const kyleSkillRate = v('kyleSkillRate') / 100;
+      const kyleEnemyLoseHp = Math.min(v('kyleEnemyLoseHp') / 100, 0.5);
+      const kyleHpPercent = v('kyleHpPercent') / 100;
+      const kyleDMGlimit = v('kyleDMGlimit') / 100;
+      const kyleEnemyHp = v('kyleEnemyHp');
+      const kyleMaxATK  = atkTotal * kyleDMGlimit;
+      const kyleEnemyHPcalc = kyleEnemyHp * kyleHpPercent;
+      const kyleCompare = Math.min(kyleEnemyHPcalc, kyleMaxATK);
+
+      nono = ( atkTotal * ( kyleSkillRate + kyleEnemyLoseHp ) * (1 + revengeDmgTotal + petDmgIncrese) * defRate )
+	    + ( kyleCompare * (1 + revengeDmgTotal + petDmgIncrese) * defRate ) ;
+      dmgCritOnly = ( atkTotal * ( kyleSkillRate + kyleEnemyLoseHp ) * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate )
+	    + ( kyleCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate ) ;
+      dmgWeakOnly = ( atkTotal * ( kyleSkillRate + kyleEnemyLoseHp ) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate )
+	    + ( kyleCompare * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate ) ;
+      dmgBoth = ( atkTotal * ( kyleSkillRate + kyleEnemyLoseHp ) * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate )
+	    + ( kyleCompare * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate ) ;
+    }
+
+
+    else {
+      nono = atkTotal * skillRate * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      dmgCritOnly = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      dmgWeakOnly = atkTotal * skillRate * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+      dmgBoth = atkTotal * skillRate * (1 + (critDmg + petCritDmg + buffCritDMG - 1)) * (1 + weakDmgTotal) * (1 + revengeDmgTotal + petDmgIncrese) * defRate;
+    }
+
+    return { nono, dmgCritOnly, dmgWeakOnly, dmgBoth };
+  }
+
+  // === 顯示結果 ===
+  function showResults(prefix, data) {
+    const fmt = (x) => !x || x<=0 ? '-' : Math.round(x).toLocaleString();
+    $(`${prefix}_nono`).textContent        = fmt(data.nono);
+    $(`${prefix}_dmgCritOnly`).textContent = fmt(data.dmgCritOnly);
+    $(`${prefix}_dmgWeakOnly`).textContent = fmt(data.dmgWeakOnly);
+    $(`${prefix}_dmgBoth`).textContent     = fmt(data.dmgBoth);
+  }
+
+  // === 顯示差異 ===
+  function showDiff(a, b) {
+    const box = $('compareResult');
+    if (!a || !b || a<=0 || b<=0) { box.textContent = '請輸入完整數值'; return; }
+    const diff = (b - a) / a * 100;
+    const sign = diff >= 0 ? '多' : '少';
+    const color = diff >= 0 ? 'text-green-600' : 'text-red-600';
+    box.innerHTML = `B 比 A <span class="${color} font-bold">${sign}${Math.abs(diff).toFixed(2)}%</span>`;
+  }
+
+  // === 更新全部 ===
+  function updateAll() {
+    syncAll();
+    const A = calc('A');
+    const B = calc('B');
+    showResults('A', A);
+    showResults('B', B);
+    showDiff(A.dmgBoth, B.dmgBoth);
+    refreshAddDmgUI();
+  }
+
+  // === 輸入事件 ===
+  function onInput(e) {
+    const node = e.target;
+    const [prefix, field] = node.id.split('_');
+    saveLS(prefix, field, node.type === 'checkbox' ? node.checked : node.value);
+
+    if (prefix === 'A') {
+      syncField(field);
+    } else if (prefix === 'B') {
+      if (node.value !== '' || (node.type === 'checkbox' && node.checked)) {
+        node.dataset.userEdited = 'true';
+        node.classList.remove('bg-gray-200','lock-icon');
+        delete node.dataset.autoSynced;
+      } else {
+        node.dataset.userEdited = 'false';
+        syncField(field);
+      }
+    }
+
+    if (field === 'addDmgType') toggleAddDmgVisibility(prefix);
+    if (field === 'espadaEnhanced' || field === 'kyleEnhanced')
+      setupSkillDefaults(prefix);
+
+    updateAll();
+  }
+
+  function bindAll() {
+    fieldList.forEach(f=>{
+      const a = get('A',f), b = get('B',f);
+      if (a) { a.addEventListener('input', onInput); a.addEventListener('change', onInput); }
+      if (b) { b.addEventListener('input', onInput); b.addEventListener('change', onInput); }
+    });
+  }
+
+  // === 重設 ===
+  function resetAll() {
+    if (!confirm('確定要清除所有數值嗎？')) return;
+    fieldList.forEach(f=>{
+      localStorage.removeItem(`A_${f}`);
+      localStorage.removeItem(`B_${f}`);
+      const a = get('A',f), b = get('B',f);
+      if (a) { a.value = ''; if (a.type==='checkbox') a.checked=false; }
+      if (b) { b.value = ''; if (b.type==='checkbox') b.checked=false; b.dataset.userEdited='false'; b.classList.remove('bg-gray-200','lock-icon'); }
+    });
+    ['A','B'].forEach(p=>{
+      $(`${p}_nono`).textContent='-';
+      $(`${p}_dmgCritOnly`).textContent='-';
+      $(`${p}_dmgWeakOnly`).textContent='-';
+      $(`${p}_dmgBoth`).textContent='-';
+    });
+    $('compareResult').textContent='請輸入完整數值';
+    refreshAddDmgUI();
+  }
+
+  // === 初始化 ===
+  loadAll();
+  bindAll();
+  syncAll();
+  updateAll();
+  $('resetBtn').addEventListener('click', resetAll);
+
+  // === 離開前儲存 ===
+  window.addEventListener('beforeunload', ()=>{
+    fieldList.forEach(f=>{
+      const a = get('A',f), b = get('B',f);
+      if (a) saveLS('A',f,a.type==='checkbox'?a.checked:a.value);
+      if (b) saveLS('B',f,b.type==='checkbox'?b.checked:b.value);
+    });
+  });
+</script>
+
+
 </body>
 </html>
 
