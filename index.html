@@ -522,9 +522,16 @@
     }
     const espadaEnhanced2 = document.getElementById(prefix + '_espadaEnhanced2');
     const espadaDMGlimit = document.getElementById(prefix + '_espadaDMGlimit');
-    const espadaDMGincrease = document.getElementById(prefix + '_espadaDMGincrease');
     if (espadaEnhanced2 && espadaDMGlimit) {
       espadaDMGlimit.value = espadaEnhanced2.checked ? 1600 : 1300;
+    }
+  }
+
+  // === 被動勾勾 ===
+  function setupDMGincreaseDefaults(prefix) {
+    const espadaEnhanced3 = document.getElementById(prefix + '_espadaEnhanced3');
+    const espadaDMGincrease = document.getElementById(prefix + '_espadaDMGincrease');
+    if (espadaEnhanced3 && espadaDMGincrease) {
       espadaDMGincrease.value = espadaEnhanced2.checked ? 40 : 32;
     }
   }
@@ -545,6 +552,7 @@
     setupSkillDefaults(prefix);
     setupHpPercentDefaults(prefix);
     setupDMGlimitDefaults(prefix);
+	setupDMGincreaseDefaults(prefix)
   }
 
   function refreshAddDmgUI() {
@@ -789,5 +797,6 @@
 
 </body>
 </html>
+
 
 
